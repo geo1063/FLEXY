@@ -3,47 +3,86 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Telegram Lite</title>
+  <title>FLEXY</title>
   <style>
+    /* Переменные авто-темы (системная синхронизация) */
     :root {
-      --bg-dark: #0e1621;
-      --panel-dark: #17212b;
-      --accent: #5288c1;
-      --text: #f5f5f5;
-      --text-muted: #7f91a4;
-      --msg-out: #2b5278;
-      --msg-in: #182533;
+      --bg: #ffffff;
+      --panel: #f4f4f5;
+      --text: #000000;
+      --text-muted: #707579;
+      --accent: #007aff;
+      --msg-out: #e3f2fd;
+      --msg-in: #f0f0f0;
+      --border: #e5e5ea;
     }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0e1621;
+        --panel: #17212b;
+        --text: #f5f5f5;
+        --text-muted: #7f91a4;
+        --accent: #5288c1;
+        --msg-out: #2b5278;
+        --msg-in: #182533;
+        --border: #101921;
+      }
+    }
+
+    /* Ручное переключение тем */
+    body.theme-dark {
+      --bg: #0e1621; --panel: #17212b; --text: #f5f5f5; --text-muted: #7f91a4;
+      --accent: #5288c1; --msg-out: #2b5278; --msg-in: #182533; --border: #101921;
+    }
+    body.theme-light {
+      --bg: #ffffff; --panel: #f4f4f5; --text: #000000; --text-muted: #707579;
+      --accent: #007aff; --msg-out: #e3f2fd; --msg-in: #f0f0f0; --border: #e5e5ea;
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { background-color: var(--bg-dark); color: var(--text); height: 100vh; height: -webkit-fill-available; overflow: hidden; display: flex; justify-content: center; }
+    body { background-color: var(--bg); color: var(--text); height: 100vh; height: -webkit-fill-available; overflow: hidden; display: flex; justify-content: center; transition: background 0.3s; }
+
+    /* Окно входа */
     #auth-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; padding: 20px; }
-    .auth-card { background: var(--panel-dark); padding: 30px; border-radius: 16px; width: 100%; max-width: 360px; text-align: center; }
-    .auth-card h2 { margin-bottom: 8px; font-weight: 600; color: #fff; }
-    .auth-card p { font-size: 14px; color: var(--text-muted); margin-bottom: 20px; }
-    .auth-card input { width: 100%; padding: 14px; background: var(--bg-dark); border: 1px solid #242f3d; color: #fff; border-radius: 10px; font-size: 16px; outline: none; margin-bottom: 15px; text-align: center; }
-    .auth-card button { width: 100%; padding: 14px; background: var(--accent); color: white; border: none; border-radius: 10px; font-weight: 600; font-size: 16px; cursor: pointer; }
+    .auth-card { background: var(--panel); padding: 30px; border-radius: 20px; width: 100%; max-width: 360px; text-align: center; border: 1px solid var(--border); }
+    .auth-card h2 { margin-bottom: 6px; font-weight: 700; font-size: 26px; color: var(--text); }
+    .auth-card p { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.4; }
+    .auth-card input { width: 100%; padding: 14px; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 12px; font-size: 16px; outline: none; margin-bottom: 12px; text-align: center; }
+    .auth-card button { width: 100%; padding: 14px; background: var(--accent); color: white; border: none; border-radius: 12px; font-weight: 600; font-size: 16px; cursor: pointer; }
+
+    /* Главный экран */
     #app-screen { display: none; width: 100%; height: 100vh; height: -webkit-fill-available; }
     .app-container { display: flex; width: 100%; height: 100%; }
-    .sidebar { width: 320px; background: var(--panel-dark); border-right: 1px solid #101921; display: flex; flex-direction: column; }
-    .user-bar { padding: 16px; background: #202b36; font-weight: 600; color: var(--accent); font-size: 15px; }
-    .search-bar { padding: 10px; }
-    .search-bar input { width: 100%; padding: 10px 14px; background: var(--bg-dark); border: none; color: #fff; border-radius: 8px; font-size: 15px; outline: none; }
+
+    .sidebar { width: 320px; background: var(--panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+    .user-bar { padding: 16px; background: var(--panel); font-weight: 700; color: var(--accent); font-size: 18px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    
+    .theme-toggle-btn { background: none; border: none; font-size: 18px; cursor: pointer; }
+    
+    .invite-box { padding: 14px; text-align: center; }
+    .invite-btn { width: 100%; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 10px; font-weight: 600; font-size: 14px; cursor: pointer; }
+
     .chats-list { flex: 1; overflow-y: auto; }
-    .chat-item { padding: 14px 16px; cursor: pointer; border-bottom: 1px solid #101921; font-weight: 500; }
-    .chat-item.active { background: #202b36; }
-    .chat-window { flex: 1; display: flex; flex-direction: column; background: var(--bg-dark); }
-    .chat-header { padding: 14px 20px; background: var(--panel-dark); font-weight: 600; border-bottom: 1px solid #101921; display: flex; align-items: center; }
+    .chat-item { padding: 16px; cursor: pointer; border-bottom: 1px solid var(--border); font-weight: 500; }
+    .chat-item.active { background: var(--bg); }
+
+    .chat-window { flex: 1; display: flex; flex-direction: column; background: var(--bg); }
+    .chat-header { padding: 14px 20px; background: var(--panel); font-weight: 600; border-bottom: 1px solid var(--border); display: flex; align-items: center; }
     .back-btn { display: none; background: none; border: none; color: var(--accent); font-size: 16px; padding-right: 12px; }
+    
     .messages-area { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; -webkit-overflow-scrolling: touch; }
-    .message { max-width: 75%; padding: 8px 12px; border-radius: 14px; font-size: 15px; line-height: 1.4; word-break: break-word; }
+    .message { max-width: 75%; padding: 10px 14px; border-radius: 16px; font-size: 15px; line-height: 1.4; word-break: break-word; }
     .message.sent { background: var(--msg-out); align-self: flex-end; border-bottom-right-radius: 4px; }
     .message.received { background: var(--msg-in); align-self: flex-start; border-bottom-left-radius: 4px; }
-    .message img { max-width: 100%; max-height: 280px; border-radius: 10px; margin-top: 4px; display: block; object-fit: cover; }
+    .message img { max-width: 100%; max-height: 280px; border-radius: 12px; margin-top: 4px; display: block; }
     .message .time { font-size: 10px; color: var(--text-muted); text-align: right; margin-top: 2px; }
-    .input-area { padding: 10px 14px; padding-bottom: max(10px, env(safe-area-inset-bottom)); background: var(--panel-dark); display: flex; gap: 10px; align-items: center; }
-    .input-area input[type="text"] { flex: 1; padding: 10px 14px; background: var(--bg-dark); border: none; color: #fff; border-radius: 20px; font-size: 16px; outline: none; }
-    .attach-btn { color: var(--accent); font-size: 22px; }
-    .send-btn { background: none; border: none; color: var(--accent); font-weight: 600; font-size: 16px; }
+
+    .input-area { padding: 10px 14px; padding-bottom: max(10px, env(safe-area-inset-bottom)); background: var(--panel); display: flex; gap: 10px; align-items: center; border-top: 1px solid var(--border); }
+    .input-area input[type="text"] { flex: 1; padding: 10px 14px; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 20px; font-size: 16px; outline: none; }
+    .attach-btn { color: var(--accent); font-size: 22px; cursor: pointer; }
+    .send-btn { background: none; border: none; color: var(--accent); font-weight: 600; font-size: 16px; cursor: pointer; }
+
     @media (max-width: 768px) {
       .sidebar { width: 100%; }
       .chat-window { display: none; width: 100%; }
@@ -54,70 +93,127 @@
   </style>
 </head>
 <body>
+
+  <!-- Авторизация -->
   <div id="auth-screen">
     <div class="auth-card">
-      <h2>Telegram Lite</h2>
-      <p>Введите ваш @username</p>
-      <input type="text" id="username-input" placeholder="например: alex" autocomplete="off" autocapitalize="off">
-      <button onclick="login()">Войти</button>
+      <h2>FLEXY</h2>
+      <p id="auth-desc">Введите ваш @username в Telegram для получения кода</p>
+      
+      <div id="step-1">
+        <input type="text" id="username-input" placeholder="@username" autocomplete="off" autocapitalize="off">
+        <button onclick="requestCode()">Запросить код</button>
+      </div>
+
+      <div id="step-2" style="display: none;">
+        <input type="number" id="code-input" placeholder="Код из Telegram" autocomplete="off">
+        <button onclick="verifyCode()">Войти в FLEXY</button>
+      </div>
     </div>
   </div>
+
+  <!-- Главный экран -->
   <div id="app-screen">
     <div class="app-container" id="app-container">
+      
       <div class="sidebar">
-        <div class="user-bar" id="my-username">@username</div>
-        <div class="search-bar">
-          <input type="text" id="search-input" placeholder="Поиск по @username..." onkeydown="if(event.key==='Enter') searchUser()">
+        <div class="user-bar">
+          <span>FLEXY</span>
+          <button class="theme-toggle-btn" onclick="toggleTheme()" title="Сменить тему">🌙</button>
         </div>
+        
+        <div class="invite-box">
+          <button class="invite-btn" onclick="copyInviteLink()">🔗 Скопировать ссылку-инвайт</button>
+        </div>
+
         <div class="chats-list" id="chats-list"></div>
       </div>
+
       <div class="chat-window">
         <div class="chat-header">
           <button class="back-btn" onclick="closeMobileChat()">‹ Назад</button>
           <span id="chat-title">Выберите чат</span>
         </div>
+        
         <div class="messages-area" id="messages-area"></div>
+
         <div class="input-area" id="input-area" style="visibility: hidden;">
           <label class="attach-btn">📷<input type="file" id="file-input" accept="image/*" style="display:none;" onchange="sendPhoto(event)"></label>
           <input type="text" id="message-input" placeholder="Сообщение..." onkeydown="if(event.key==='Enter') sendTextMessage()">
           <button class="send-btn" onclick="sendTextMessage()">Отправ.</button>
         </div>
       </div>
+
     </div>
   </div>
+
   <script src="/socket.io/socket.io.js"></script>
   <script>
     const socket = io();
     let currentUser = '', activeChatUser = null;
     const chatHistories = {};
-    function login() {
-      const val = document.getElementById('username-input').value.trim();
-      if (val) socket.emit('register', val);
+
+    // Запоминаем инвайт из URL (?invite=username)
+    const urlParams = new URLSearchParams(window.location.search);
+    const pendingInvite = urlParams.get('invite');
+
+    function requestCode() {
+      const user = document.getElementById('username-input').value.trim();
+      if (!user) return alert('Введите ваш username');
+      currentUser = user.replace(/^@/, '');
+      socket.emit('request_code', currentUser);
     }
+
+    socket.on('code_sent', ({ success, error }) => {
+      if (success) {
+        document.getElementById('step-1').style.display = 'none';
+        document.getElementById('step-2').style.display = 'block';
+        document.getElementById('auth-desc').innerText = `Код отправлен в Telegram на @${currentUser}`;
+      } else {
+        alert(error);
+      }
+    });
+
+    function verifyCode() {
+      const code = document.getElementById('code-input').value.trim();
+      if (code) {
+        socket.emit('verify_code', { username: currentUser, code });
+      }
+    }
+
+    socket.on('auth_error', (msg) => alert(msg));
+
     socket.on('registered', ({ username }) => {
       currentUser = username;
-      document.getElementById('my-username').innerText = `@${username}`;
       document.getElementById('auth-screen').style.display = 'none';
       document.getElementById('app-screen').style.display = 'block';
+
+      // Если зашли по инвайт-ссылке, сразу открываем диалог с другом
+      if (pendingInvite && pendingInvite.toLowerCase() !== currentUser.toLowerCase()) {
+        openChat(pendingInvite.toLowerCase());
+      }
     });
-    function searchUser() {
-      const q = document.getElementById('search-input').value.trim();
-      if (q) socket.emit('search_user', q);
+
+    function copyInviteLink() {
+      const link = `${window.location.origin}?invite=${currentUser}`;
+      navigator.clipboard.writeText(link);
+      alert('Инвайт-ссылка скопирована! Отправьте её другу.');
     }
-    socket.on('search_result', ({ username, exists }) => {
-      if (!exists) return alert(`Пользователь @${username} оффлайн или не найден.`);
-      document.getElementById('search-input').value = '';
-      openChat(username);
-    });
+
     function openChat(username) {
       activeChatUser = username;
       if (!chatHistories[username]) chatHistories[username] = [];
       document.getElementById('chat-title').innerText = `@${username}`;
       document.getElementById('input-area').style.visibility = 'visible';
       document.getElementById('app-container').classList.add('chat-active');
-      updateChatsList(); renderMessages();
+      updateChatsList();
+      renderMessages();
     }
-    function closeMobileChat() { document.getElementById('app-container').classList.remove('chat-active'); }
+
+    function closeMobileChat() {
+      document.getElementById('app-container').classList.remove('chat-active');
+    }
+
     function updateChatsList() {
       const list = document.getElementById('chats-list'); list.innerHTML = '';
       Object.keys(chatHistories).forEach(u => {
@@ -128,6 +224,7 @@
         list.appendChild(d);
       });
     }
+
     function sendTextMessage() {
       const el = document.getElementById('message-input');
       if (el.value.trim() && activeChatUser) {
@@ -135,6 +232,7 @@
         el.value = '';
       }
     }
+
     function sendPhoto(e) {
       const file = e.target.files[0];
       if (!file || !activeChatUser) return;
@@ -145,8 +243,10 @@
       };
       r.readAsDataURL(file);
     }
+
     socket.on('message_sent', handleIncoming);
     socket.on('receive_message', handleIncoming);
+
     function handleIncoming(data) {
       const partner = data.sender === currentUser ? data.to : data.sender;
       if (!chatHistories[partner]) chatHistories[partner] = [];
@@ -154,6 +254,7 @@
       if (activeChatUser === partner) renderMessages();
       updateChatsList();
     }
+
     function renderMessages() {
       const area = document.getElementById('messages-area'); area.innerHTML = '';
       if (!activeChatUser || !chatHistories[activeChatUser]) return;
@@ -165,6 +266,18 @@
       });
       area.scrollTop = area.scrollHeight;
     }
+
+    // Переключатель темы
+    function toggleTheme() {
+      if (document.body.classList.contains('theme-dark')) {
+        document.body.classList.remove('theme-dark');
+        document.body.classList.add('theme-light');
+      } else {
+        document.body.classList.remove('theme-light');
+        document.body.classList.add('theme-dark');
+      }
+    }
+
     function escapeHTML(s) { return s.replace(/[&<>'"]/g, t => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[t]||t)); }
   </script>
 </body>
