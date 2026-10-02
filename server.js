@@ -3,7 +3,8 @@ const http = require('http');
 const { Server } = require('socket.io');
 const path = require('path');
 
-//8957995967:AAHMGLzAEfC5UJL4CARs0TG_IK9K5TEWEMg;
+// Токен бота сгенерирован и подставлен
+const TG_BOT_TOKEN = '8957995967:AAHMGLzAEfC5UJL4CARs0TG_IK9K5TEWEMg';
 
 const app = express();
 const server = http.createServer(app);
@@ -13,57 +14,56 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const users = new Map();        // username -> socket.id
 const socketToUser = new Map(); // socket.id -> username
-const pendingCodes = new Map(); // username -> 4-digit code
+const pendingCodes = new Map(); // code -> username
+
+// Бот проверяет сообщения в Telegram
+let lastUpdateId = 0;
+async function pollTelegram() {
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/getUpdates?offset=${lastUpdateId + 1}&timeout=5`);
+    const data = await res.json();
+    if (data.ok && data.result) {
+      for (const update of data.result) {
+        lastUpdateId = update.update_id;
+        if (update.message) {
+          const chatId = update.message.chat.id;
+          const username = update.message.from.username || `id_${chatId}`;
+          
+          // Генерируем 4-значный код
+          const code = Math.floor(1000 + Math.random() * 9000).toString();
+          pendingCodes.set(code, username.toLowerCase());
+
+          // Отправляем код пользователю в Telegram
+          await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              chat_id: chatId,
+              text: `🔐 Ваш код для входа в FLEXY: ${code}`
+            })
+          });
+        }
+      }
+    }
+  } catch (e) {
+    console.error('Ошибка бота:', e);
+  }
+  setTimeout(pollTelegram, 2000);
+}
+
+pollTelegram();
 
 io.on('connection', (socket) => {
-
-  // Запрос кода подтверждения
-  socket.on('request_code', async (tgUsername) => {
-    const cleanUser = tgUsername.trim().toLowerCase().replace(/^@/, '');
-    if (!cleanUser) return;
-
-    // Генерируем 4-значный код
-    const code = Math.floor(1000 + Math.random() * 9000).toString();
-    pendingCodes.set(cleanUser, code);
-
-    try {
-      // Отправляем сообщение через Telegram Bot API
-      const response = await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: `@${cleanUser}`,
-          text: `🔐 Ваш код подтверждения для входа в FLEXY: ${code}`
-        })
-      });
-
-      const data = await response.json();
-
-      if (data.ok) {
-        socket.emit('code_sent', { success: true });
-      } else {
-        socket.emit('code_sent', { 
-          success: false, 
-          error: 'Сначала напишите боту /start в Telegram, чтобы он мог прислать вам код!' 
-        });
-      }
-    } catch (err) {
-      socket.emit('code_sent', { success: false, error: 'Ошибка отправки кода в Telegram.' });
-    }
-  });
-
-  // Проверка кода и вход
-  socket.on('verify_code', ({ username, code }) => {
-    const cleanUser = username.trim().toLowerCase().replace(/^@/, '');
-    const savedCode = pendingCodes.get(cleanUser);
-
-    if (savedCode && savedCode === code.trim()) {
-      pendingCodes.delete(cleanUser);
-      users.set(cleanUser, socket.id);
-      socketToUser.set(socket.id, cleanUser);
-      socket.emit('registered', { username: cleanUser });
+  // Проверка кода
+  socket.on('verify_code', (code) => {
+    const username = pendingCodes.get(code.trim());
+    if (username) {
+      pendingCodes.delete(code.trim());
+      users.set(username, socket.id);
+      socketToUser.set(socket.id, username);
+      socket.emit('registered', { username });
     } else {
-      socket.emit('auth_error', 'Неверный код подтверждения!');
+      socket.emit('auth_error', 'Неверный или устаревший код!');
     }
   });
 
@@ -96,4 +96,4 @@ io.on('connection', (socket) => {
 });
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`FLEXY server started on ${PORT}`));
+server.listen(PORT, () => console.log(`FLEXY запущен на порту ${PORT}`));
