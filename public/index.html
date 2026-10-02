@@ -45,7 +45,7 @@
       opacity: 0.75;
     }
 
-    /* Авторизация */
+    /* Экран авторизации */
     #auth-screen { 
       display: flex; 
       flex-direction: column; 
@@ -72,7 +72,7 @@
     .auth-card input { width: 100%; padding: 14px; background: #000; border: 1px solid var(--border); color: var(--text); border-radius: 14px; font-size: 20px; outline: none; margin-bottom: 14px; text-align: center; letter-spacing: 4px; }
     .auth-card button { width: 100%; padding: 14px; background: var(--accent); color: white; border: none; border-radius: 14px; font-weight: 600; font-size: 16px; cursor: pointer; }
 
-    /* Приложение */
+    /* Главный экран */
     #app-screen { display: none; width: 100%; height: 100dvh; }
     .app-container { display: flex; width: 100%; height: 100dvh; position: relative; overflow: hidden; }
 
@@ -99,7 +99,7 @@
     .chat-item.active { background: #1f1f22; }
     .chat-item-avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--avatar-bg); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; flex-shrink: 0; }
 
-    /* Окно чата */
+    /* Чат */
     .chat-window { 
       flex: 1; 
       display: flex; 
@@ -302,7 +302,10 @@
             <span class="header-title" id="chat-title">Чат не выбран</span>
             <span class="header-status" id="chat-status">выберите собеседника</span>
           </div>
-          <div class="header-avatar" id="chat-avatar">?</div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <button class="icon-btn" id="clear-chat-btn" onclick="clearCurrentChat()" style="display:none;" title="Очистить чат">🗑️</button>
+            <div class="header-avatar" id="chat-avatar">?</div>
+          </div>
         </div>
 
         <div class="messages-area" id="messages-area">
@@ -334,13 +337,14 @@
   <script>
     const socket = io();
     let currentUser = '', activeChatUser = null;
-    const chatHistories = {};
 
+    // Загрузка сохраненной истории и списка друзей из памяти браузера
+    let chatHistories = JSON.parse(localStorage.getItem('flexy_chat_histories') || '{}');
     let savedFriends = JSON.parse(localStorage.getItem('flexy_friends') || '[]');
+    
     const urlParams = new URLSearchParams(window.location.search);
     const pendingInvite = urlParams.get('invite');
 
-    // Автоматическая авторизация при подключении/переподключении к сокету
     socket.on('connect', () => {
       const storedUser = localStorage.getItem('flexy_username');
       if (storedUser) {
@@ -373,7 +377,7 @@
     });
 
     function logout() {
-      if (confirm('Выйти из аккаунта?')) {
+      if (confirm('Выйти из аккаунта? История на устройстве сохранится.')) {
         localStorage.removeItem('flexy_username');
         location.reload();
       }
@@ -413,6 +417,7 @@
       document.getElementById('chat-status').innerText = `в сети`;
       document.getElementById('chat-avatar').innerText = activeChatUser.charAt(0).toUpperCase();
       document.getElementById('input-area').style.visibility = 'visible';
+      document.getElementById('clear-chat-btn').style.display = 'block';
       document.getElementById('app-container').classList.add('chat-active');
       
       updateChatsList();
@@ -423,16 +428,33 @@
       document.getElementById('app-container').classList.remove('chat-active');
     }
 
+    function clearCurrentChat() {
+      if (!activeChatUser) return;
+      if (confirm(`Удалить историю диалога с @${activeChatUser}?`)) {
+        chatHistories[activeChatUser] = [];
+        localStorage.setItem('flexy_chat_histories', JSON.stringify(chatHistories));
+        renderMessages();
+        updateChatsList();
+      }
+    }
+
     function updateChatsList() {
       const list = document.getElementById('chats-list'); list.innerHTML = '';
       savedFriends.forEach(u => {
+        const history = chatHistories[u] || [];
+        const lastMsg = history.length > 0 ? history[history.length - 1] : null;
+        let lastText = 'Нет сообщений';
+        if (lastMsg) {
+          lastText = lastMsg.type === 'image' ? '📷 Фотография' : lastMsg.content;
+        }
+
         const d = document.createElement('div');
         d.className = `chat-item ${u === activeChatUser ? 'active' : ''}`;
         d.innerHTML = `
           <div class="chat-item-avatar">${u.charAt(0).toUpperCase()}</div>
-          <div style="flex:1;">
+          <div style="flex:1; overflow:hidden;">
             <div style="font-size:15px; font-weight:600;">@${u}</div>
-            <div style="font-size:12px; color:var(--text-muted);">Нажмите для диалога</div>
+            <div style="font-size:12px; color:var(--text-muted); text-overflow:ellipsis; white-space:nowrap; overflow:hidden;">${escapeHTML(lastText)}</div>
           </div>
         `;
         d.onclick = () => openChat(u);
@@ -444,7 +466,7 @@
       const el = document.getElementById('message-input');
       const text = el.value.trim();
       if (!text) return;
-      if (!activeChatUser) return alert('Выберите чат слева или добавьте друга');
+      if (!activeChatUser) return alert('Выберите чат');
 
       socket.emit('private_message', { to: activeChatUser, content: text, type: 'text' });
       el.value = '';
@@ -467,8 +489,13 @@
     function handleIncoming(data) {
       const partner = data.sender === currentUser ? data.to : data.sender;
       addFriend(partner);
+      
       if (!chatHistories[partner]) chatHistories[partner] = [];
       chatHistories[partner].push(data);
+
+      // Сохраняем обновившуюся историю в локальную память браузера
+      localStorage.setItem('flexy_chat_histories', JSON.stringify(chatHistories));
+
       if (activeChatUser === partner) renderMessages();
       updateChatsList();
     }
@@ -479,7 +506,7 @@
 
       const datePill = document.createElement('div');
       datePill.className = 'system-date-pill';
-      datePill.innerText = 'Сегодня';
+      datePill.innerText = 'История диалога';
       area.appendChild(datePill);
 
       chatHistories[activeChatUser].forEach(m => {
@@ -495,4 +522,3 @@
   </script>
 </body>
 </html>
-
