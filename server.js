@@ -2,12 +2,12 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const TelegramBot = require('node-telegram-bot-api');
-const path = require('path'); // 👈 добавили путь
+const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
 
-// 🛑 Полный запрет кэширования
+// Отключение кэширования
 app.use((req, res, next) => {
   res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
   res.setHeader('Pragma', 'no-cache');
@@ -15,10 +15,9 @@ app.use((req, res, next) => {
   next();
 });
 
-// Отдача статики
+// Раздача статики
 app.use(express.static(path.join(__dirname, 'public')));
 
-// 🎯 Принудительно отдаем index.html при открытии сайта
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
@@ -36,9 +35,15 @@ let bot;
 if (TELEGRAM_BOT_TOKEN) {
   try {
     bot = new TelegramBot(TELEGRAM_BOT_TOKEN, { polling: true });
+    
+    // 🛡️ ЗАЩИТА: Чтобы ошибки бота не ломали деплой на хостинге
+    bot.on('polling_error', (error) => {
+      console.log(' Telegram polling info:', error.message);
+    });
+
     console.log('🤖 Telegram бот запущен');
   } catch (e) {
-    console.log(' Ошибка бота:', e.message);
+    console.log(' Ошибка инициализации бота:', e.message);
   }
 }
 
