@@ -4,20 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   
-  <!-- PWA & Standalone режим для iOS -->
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-touch-fullscreen" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="FLEXY">
-  <meta name="mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#09090b">
-
-  <!-- Векторная иконка -->
-  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' style='background:linear-gradient(135deg, %230a84ff, %235e5ce6);'><text x='50%' y='68%' font-size='320' font-weight='900' fill='white' text-anchor='middle' font-family='-apple-system, system-ui'>F</text></svg>">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' style='background:linear-gradient(135deg, %230a84ff, %235e5ce6);'><text x='50%' y='68%' font-size='320' font-weight='900' fill='white' text-anchor='middle' font-family='-apple-system, system-ui'>F</text></svg>">
-
-  <!-- Manifest -->
-  <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22FLEXY%22%2C%22short_name%22%3A%22FLEXY%22%2C%22start_url%22%3A%22%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%2309090b%22%2C%22theme_color%22%3A%22%2309090b%22%7D">
 
   <title>FLEXY</title>
 
@@ -26,470 +15,116 @@
 
     :root {
       --bg: #09090b;
-      --bg-ambient-1: rgba(10, 132, 255, 0.15);
-      --bg-ambient-2: rgba(191, 90, 242, 0.12);
-      --card-bg: rgba(22, 22, 26, 0.65);
-      --card-border: rgba(255, 255, 255, 0.08);
-      --glass-panel: rgba(18, 18, 22, 0.75);
+      --bg-ambient-1: rgba(10, 132, 255, 0.18);
+      --bg-ambient-2: rgba(191, 90, 242, 0.15);
+      --card-bg: rgba(22, 22, 28, 0.75);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --glass-panel: rgba(18, 18, 22, 0.8);
       --text: #f4f4f5;
       --text-muted: #a1a1aa;
       --accent: #0a84ff;
       --accent-gradient: linear-gradient(135deg, #0a84ff 0%, #5e5ce6 100%);
       --msg-out-gradient: linear-gradient(135deg, #0071e3 0%, #0a84ff 100%);
-      --msg-in: rgba(255, 255, 255, 0.06);
-      --msg-in-border: rgba(255, 255, 255, 0.05);
-      --input-bg: rgba(255, 255, 255, 0.05);
-      --input-border: rgba(255, 255, 255, 0.1);
+      --msg-in: rgba(255, 255, 255, 0.07);
+      --msg-in-border: rgba(255, 255, 255, 0.08);
+      --input-bg: rgba(255, 255, 255, 0.06);
+      --input-border: rgba(255, 255, 255, 0.12);
       --shadow-glow: 0 0 35px rgba(10, 132, 255, 0.25);
-      --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      --ease-ios: cubic-bezier(0.2, 0.8, 0.2, 1);
     }
 
     body.light-theme {
       --bg: #f4f4f7;
       --bg-ambient-1: rgba(0, 122, 255, 0.12);
       --bg-ambient-2: rgba(175, 82, 222, 0.1);
-      --card-bg: rgba(255, 255, 255, 0.8);
+      --card-bg: rgba(255, 255, 255, 0.85);
       --card-border: rgba(0, 0, 0, 0.08);
-      --glass-panel: rgba(255, 255, 255, 0.85);
+      --glass-panel: rgba(255, 255, 255, 0.88);
       --text: #09090b;
       --text-muted: #71717a;
       --accent: #007aff;
       --accent-gradient: linear-gradient(135deg, #007aff 0%, #5856d6 100%);
       --msg-out-gradient: linear-gradient(135deg, #007aff 0%, #34c759 100%);
-      --msg-in: rgba(0, 0, 0, 0.04);
-      --msg-in-border: rgba(0, 0, 0, 0.05);
+      --msg-in: rgba(0, 0, 0, 0.05);
+      --msg-in-border: rgba(0, 0, 0, 0.06);
       --input-bg: rgba(0, 0, 0, 0.04);
       --input-border: rgba(0, 0, 0, 0.08);
-      --shadow-glow: 0 0 30px rgba(0, 122, 255, 0.15);
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      -webkit-tap-highlight-color: transparent;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
+    html, body { background-color: var(--bg); color: var(--text); height: 100%; width: 100%; overflow: hidden; position: fixed; }
 
-    html, body {
-      background-color: var(--bg);
-      color: var(--text);
-      height: 100%;
-      width: 100%;
-      overflow: hidden;
-      position: fixed;
-    }
+    .ambient-bg { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+    .ambient-glow-1 { position: absolute; top: -20%; left: -10%; width: 60vw; height: 60vw; background: var(--bg-ambient-1); filter: blur(120px); border-radius: 50%; }
+    .ambient-glow-2 { position: absolute; bottom: -20%; right: -10%; width: 60vw; height: 60vw; background: var(--bg-ambient-2); filter: blur(120px); border-radius: 50%; }
 
-    /* Размытый неоновый фон */
-    .ambient-bg {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
-      overflow: hidden;
-    }
-    .ambient-glow-1 {
-      position: absolute;
-      top: -20%;
-      left: -10%;
-      width: 60vw;
-      height: 60vw;
-      background: var(--bg-ambient-1);
-      filter: blur(120px);
-      border-radius: 50%;
-    }
-    .ambient-glow-2 {
-      position: absolute;
-      bottom: -20%;
-      right: -10%;
-      width: 60vw;
-      height: 60vw;
-      background: var(--bg-ambient-2);
-      filter: blur(120px);
-      border-radius: 50%;
-    }
+    #toast-container { position: fixed; top: max(16px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; width: 90%; max-width: 400px; pointer-events: none; }
+    .toast-banner { pointer-events: auto; background: var(--glass-panel); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 1px solid var(--card-border); color: var(--text); padding: 14px 18px; border-radius: 20px; box-shadow: 0 16px 32px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 14px; cursor: pointer; animation: toastIn 0.3s ease; }
+    @keyframes toastIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* Кнопки и интерактивы */
-    button, .action-btn, .icon-btn, .chat-item {
-      transition: transform 0.2s var(--ease-ios), opacity 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
-    }
-    button:active, .action-btn:active, .icon-btn:active, .chat-item:active {
-      transform: scale(0.95);
-    }
-
-    /* Toasts */
-    #toast-container {
-      position: fixed;
-      top: max(16px, env(safe-area-inset-top));
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 9999;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      width: 90%;
-      max-width: 400px;
-      pointer-events: none;
-    }
-
-    .toast-banner {
-      pointer-events: auto;
-      background: var(--glass-panel);
-      backdrop-filter: blur(25px) saturate(180%);
-      -webkit-backdrop-filter: blur(25px) saturate(180%);
-      border: 1px solid var(--card-border);
-      color: var(--text);
-      padding: 14px 18px;
-      border-radius: 20px;
-      box-shadow: 0 16px 32px rgba(0,0,0,0.25);
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      cursor: pointer;
-      animation: toastIn 0.35s var(--ease-spring) forwards;
-    }
-
-    @keyframes toastIn {
-      from { opacity: 0; transform: translateY(-30px) scale(0.9); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
-
-    .toast-avatar {
-      width: 42px; height: 42px; border-radius: 50%;
-      background: var(--accent-gradient); color: white;
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 700; font-size: 16px; flex-shrink: 0;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    }
-
+    .toast-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--accent-gradient); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0; }
     .toast-content { flex: 1; overflow: hidden; }
     .toast-title { font-size: 14px; font-weight: 700; }
     .toast-body { font-size: 13px; color: var(--text-muted); text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
 
-    /* Авторизация */
-    #auth-screen {
-      position: relative;
-      z-index: 10;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100dvh;
-      padding: 20px;
-    }
+    #auth-screen { position: relative; z-index: 10; display: flex; justify-content: center; align-items: center; height: 100dvh; padding: 20px; }
+    .auth-card { background: var(--card-bg); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border: 1px solid var(--card-border); color: var(--text); padding: 40px 30px; border-radius: 32px; width: 100%; max-width: 380px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.4); }
+    .brand-badge { width: 64px; height: 64px; margin: 0 auto 16px; border-radius: 20px; background: var(--accent-gradient); display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 800; color: #fff; box-shadow: var(--shadow-glow); }
+    .auth-card h2 { font-size: 26px; font-weight: 800; margin-bottom: 6px; }
+    .auth-card p { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.5; }
 
-    .auth-card {
-      background: var(--card-bg);
-      backdrop-filter: blur(30px) saturate(180%);
-      -webkit-backdrop-filter: blur(30px) saturate(180%);
-      border: 1px solid var(--card-border);
-      color: var(--text);
-      padding: 40px 30px;
-      border-radius: 32px;
-      width: 100%;
-      max-width: 380px;
-      text-align: center;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-      animation: cardAppear 0.5s var(--ease-ios) forwards;
-    }
+    .bot-link-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 16px; background: rgba(42, 171, 238, 0.15); border: 1px solid rgba(42, 171, 238, 0.3); color: #2AABEE; text-decoration: none; border-radius: 18px; font-weight: 600; font-size: 15px; margin-bottom: 16px; }
+    .auth-card input { width: 100%; padding: 16px; background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text); border-radius: 18px; font-size: 24px; font-weight: 700; outline: none; margin-bottom: 16px; text-align: center; letter-spacing: 6px; }
+    .submit-btn { width: 100%; padding: 16px; background: var(--accent-gradient); color: white; border: none; border-radius: 18px; font-weight: 700; font-size: 16px; cursor: pointer; box-shadow: var(--shadow-glow); }
 
-    @keyframes cardAppear {
-      from { opacity: 0; transform: translateY(30px) scale(0.95); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
-
-    .brand-badge {
-      width: 64px;
-      height: 64px;
-      margin: 0 auto 16px;
-      border-radius: 20px;
-      background: var(--accent-gradient);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 32px;
-      font-weight: 800;
-      color: #fff;
-      box-shadow: var(--shadow-glow);
-    }
-
-    .auth-card h2 { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 6px; }
-    .auth-card p { font-size: 14px; color: var(--text-muted); margin-bottom: 28px; line-height: 1.5; }
-
-    .bot-link-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      width: 100%;
-      padding: 16px;
-      background: rgba(42, 171, 238, 0.15);
-      border: 1px solid rgba(42, 171, 238, 0.3);
-      color: #2AABEE;
-      text-decoration: none;
-      border-radius: 18px;
-      font-weight: 600;
-      font-size: 15px;
-      margin-bottom: 16px;
-      transition: 0.2s ease;
-    }
-    .bot-link-btn:hover { background: rgba(42, 171, 238, 0.25); }
-
-    .auth-card input {
-      width: 100%;
-      padding: 16px;
-      background: var(--input-bg);
-      border: 1px solid var(--input-border);
-      color: var(--text);
-      border-radius: 18px;
-      font-size: 24px;
-      font-weight: 700;
-      outline: none;
-      margin-bottom: 16px;
-      text-align: center;
-      letter-spacing: 6px;
-      transition: 0.2s ease;
-    }
-    .auth-card input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.15); }
-
-    .submit-btn {
-      width: 100%;
-      padding: 16px;
-      background: var(--accent-gradient);
-      color: white;
-      border: none;
-      border-radius: 18px;
-      font-weight: 700;
-      font-size: 16px;
-      cursor: pointer;
-      box-shadow: var(--shadow-glow);
-    }
-
-    /* Главное приложение */
     #app-screen { display: none; width: 100%; height: 100dvh; position: relative; z-index: 10; }
     .app-container { display: flex; width: 100%; height: 100dvh; position: relative; overflow: hidden; }
 
-    /* Сайдбар */
-    .sidebar {
-      width: 360px;
-      background: var(--glass-panel);
-      backdrop-filter: blur(30px) saturate(180%);
-      -webkit-backdrop-filter: blur(30px) saturate(180%);
-      border-right: 1px solid var(--card-border);
-      display: flex;
-      flex-direction: column;
-      height: 100dvh;
-      flex-shrink: 0;
-    }
-
-    .user-bar {
-      padding: 18px 20px;
-      padding-top: max(18px, env(safe-area-inset-top));
-      border-bottom: 1px solid var(--card-border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .user-info { font-size: 18px; font-weight: 800; letter-spacing: -0.3px; display: flex; align-items: center; gap: 8px; }
+    .sidebar { width: 360px; background: var(--glass-panel); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border-right: 1px solid var(--card-border); display: flex; flex-direction: column; height: 100dvh; flex-shrink: 0; }
+    .user-bar { padding: 18px 20px; padding-top: max(18px, env(safe-area-inset-top)); border-bottom: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center; }
+    .user-info { font-size: 18px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
     .header-actions { display: flex; gap: 8px; }
-
-    .icon-btn {
-      width: 38px; height: 38px; border-radius: 12px;
-      background: var(--input-bg); border: 1px solid var(--input-border);
-      color: var(--text); font-size: 16px; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-    }
+    .icon-btn { width: 38px; height: 38px; border-radius: 12px; background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
     .actions-box { padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; border-bottom: 1px solid var(--card-border); }
-    .action-btn {
-      width: 100%; padding: 12px 16px;
-      background: var(--accent-gradient); color: white;
-      border: none; border-radius: 14px; font-weight: 600; font-size: 13px;
-      cursor: pointer; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    }
-    .action-btn.secondary {
-      background: var(--input-bg); border: 1px solid var(--input-border);
-      color: var(--text); box-shadow: none;
-    }
+    .action-btn { width: 100%; padding: 12px 16px; background: var(--accent-gradient); color: white; border: none; border-radius: 14px; font-weight: 600; font-size: 13px; cursor: pointer; text-align: center; }
+    .action-btn.secondary { background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text); }
 
     .chats-list { flex: 1; overflow-y: auto; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; }
-    .chat-item {
-      padding: 12px 14px; border-radius: 18px; cursor: pointer;
-      display: flex; align-items: center; gap: 14px;
-      border: 1px solid transparent;
-    }
-    .chat-item:hover { background: var(--input-bg); }
-    .chat-item.active {
-      background: var(--input-bg);
-      border-color: var(--card-border);
-    }
+    .chat-item { padding: 12px 14px; border-radius: 18px; cursor: pointer; display: flex; align-items: center; gap: 14px; border: 1px solid transparent; }
+    .chat-item:hover, .chat-item.active { background: var(--input-bg); border-color: var(--card-border); }
+    .chat-item-avatar { width: 46px; height: 46px; border-radius: 16px; background: var(--accent-gradient); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; flex-shrink: 0; }
 
-    .chat-item-avatar {
-      width: 46px; height: 46px; border-radius: 16px;
-      background: var(--accent-gradient); color: white;
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 800; font-size: 18px; flex-shrink: 0;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    }
-
-    /* Окно чата */
-    .chat-window {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      position: relative;
-      height: 100dvh;
-      overflow: hidden;
-      background: rgba(0, 0, 0, 0.1);
-    }
-
-    .chat-header {
-      padding: 14px 20px;
-      padding-top: max(14px, env(safe-area-inset-top));
-      background: var(--glass-panel);
-      backdrop-filter: blur(30px) saturate(180%);
-      -webkit-backdrop-filter: blur(30px) saturate(180%);
-      border-bottom: 1px solid var(--card-border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      z-index: 10;
-    }
-
+    .chat-window { flex: 1; display: flex; flex-direction: column; justify-content: space-between; position: relative; height: 100dvh; overflow: hidden; background: rgba(0, 0, 0, 0.1); }
+    .chat-header { padding: 14px 20px; padding-top: max(14px, env(safe-area-inset-top)); background: var(--glass-panel); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border-bottom: 1px solid var(--card-border); display: flex; align-items: center; justify-content: space-between; z-index: 10; }
     .header-left { display: flex; align-items: center; gap: 12px; }
-    .back-btn-pill {
-      display: none; align-items: center; justify-content: center;
-      padding: 8px 14px; background: var(--input-bg);
-      border: 1px solid var(--input-border); border-radius: 14px;
-      color: var(--text); font-size: 13px; font-weight: 700; cursor: pointer;
-    }
-
+    .back-btn-pill { display: none; align-items: center; justify-content: center; padding: 8px 14px; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 14px; color: var(--text); font-size: 13px; font-weight: 700; cursor: pointer; }
     .header-user-meta { display: flex; align-items: center; gap: 12px; }
-    .header-avatar {
-      width: 40px; height: 40px; border-radius: 14px;
-      background: var(--accent-gradient); color: white;
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 700; font-size: 16px;
-    }
-    .header-title { font-size: 16px; font-weight: 700; line-height: 1.2; }
+    .header-avatar { width: 40px; height: 40px; border-radius: 14px; background: var(--accent-gradient); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; }
+    .header-title { font-size: 16px; font-weight: 700; }
     .header-status { font-size: 12px; color: #30d158; font-weight: 600; display: flex; align-items: center; gap: 4px; }
     .header-status::before { content: ''; width: 6px; height: 6px; background: #30d158; border-radius: 50%; display: inline-block; }
 
-    /* Сообщения */
-    .messages-area {
-      flex: 1;
-      padding: 20px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      -webkit-overflow-scrolling: touch;
-    }
+    .messages-area { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; -webkit-overflow-scrolling: touch; }
+    .system-date-pill { align-self: center; background: var(--glass-panel); backdrop-filter: blur(10px); border: 1px solid var(--card-border); color: var(--text-muted); font-size: 12px; font-weight: 600; padding: 6px 16px; border-radius: 20px; margin: 12px 0; }
 
-    .system-date-pill {
-      align-self: center;
-      background: var(--glass-panel);
-      backdrop-filter: blur(10px);
-      border: 1px solid var(--card-border);
-      color: var(--text-muted);
-      font-size: 12px; font-weight: 600;
-      padding: 6px 16px; border-radius: 20px;
-      margin: 12px 0;
-    }
+    .message { max-width: 70%; padding: 12px 16px; border-radius: 22px; font-size: 15px; line-height: 1.45; word-break: break-word; position: relative; animation: msgPop 0.2s ease forwards; }
+    @keyframes msgPop { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    .message {
-      max-width: 70%;
-      padding: 12px 16px;
-      border-radius: 22px;
-      font-size: 15px;
-      line-height: 1.45;
-      word-break: break-word;
-      position: relative;
-      animation: msgPop 0.25s var(--ease-spring) forwards;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    }
-
-    @keyframes msgPop {
-      from { opacity: 0; transform: translateY(12px) scale(0.95); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
-
-    .message.sent {
-      background: var(--msg-out-gradient);
-      align-self: flex-end;
-      border-bottom-right-radius: 6px;
-      color: #ffffff;
-      box-shadow: 0 4px 20px rgba(10, 132, 255, 0.25);
-    }
-    .message.received {
-      background: var(--msg-in);
-      backdrop-filter: blur(15px);
-      border: 1px solid var(--msg-in-border);
-      align-self: flex-start;
-      border-bottom-left-radius: 6px;
-      color: var(--text);
-    }
-
+    .message.sent { background: var(--msg-out-gradient); align-self: flex-end; border-bottom-right-radius: 6px; color: #ffffff; box-shadow: 0 4px 20px rgba(10, 132, 255, 0.25); }
+    .message.received { background: var(--msg-in); backdrop-filter: blur(15px); border: 1px solid var(--msg-in-border); align-self: flex-start; border-bottom-left-radius: 6px; color: var(--text); }
     .message img { max-width: 100%; max-height: 320px; border-radius: 16px; margin-top: 6px; display: block; }
     .message .time { font-size: 10px; opacity: 0.6; text-align: right; margin-top: 4px; font-weight: 600; }
 
-    /* Нижняя плавающая панель ввода */
-    .input-area-wrapper {
-      padding: 12px 20px;
-      padding-bottom: max(16px, env(safe-area-inset-bottom));
-      z-index: 10;
-    }
+    .input-area-wrapper { padding: 12px 20px; padding-bottom: max(16px, env(safe-area-inset-bottom)); z-index: 10; }
+    .input-area { background: var(--glass-panel); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border: 1px solid var(--card-border); border-radius: 26px; padding: 6px 8px 6px 14px; display: flex; gap: 10px; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+    .attach-btn-circle { width: 40px; height: 40px; border-radius: 50%; background: var(--input-bg); border: 1px solid var(--input-border); display: flex; align-items: center; justify-content: center; color: var(--text); font-size: 18px; cursor: pointer; flex-shrink: 0; }
+    .input-area input { flex: 1; background: none; border: none; outline: none; color: var(--text); font-size: 15px; font-weight: 500; }
+    .send-circle-btn { width: 42px; height: 42px; border-radius: 50%; background: var(--accent-gradient); border: none; color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; box-shadow: var(--shadow-glow); }
 
-    .input-area {
-      background: var(--glass-panel);
-      backdrop-filter: blur(30px) saturate(180%);
-      -webkit-backdrop-filter: blur(30px) saturate(180%);
-      border: 1px solid var(--card-border);
-      border-radius: 26px;
-      padding: 6px 8px 6px 14px;
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    }
-
-    .attach-btn-circle {
-      width: 40px; height: 40px; border-radius: 50%;
-      background: var(--input-bg); border: 1px solid var(--input-border);
-      display: flex; align-items: center; justify-content: center;
-      color: var(--text); font-size: 18px; cursor: pointer; flex-shrink: 0;
-      transition: 0.2s ease;
-    }
-    .attach-btn-circle:hover { background: rgba(255, 255, 255, 0.15); }
-
-    .input-area input {
-      flex: 1; background: none; border: none; outline: none;
-      color: var(--text); font-size: 15px; font-weight: 500;
-    }
-    .input-area input::placeholder { color: var(--text-muted); }
-
-    .send-circle-btn {
-      width: 42px; height: 42px; border-radius: 50%;
-      background: var(--accent-gradient); border: none; color: #fff;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; flex-shrink: 0;
-      box-shadow: var(--shadow-glow);
-    }
-
-    /* Мобильный адаптив */
     @media (max-width: 768px) {
       .sidebar { width: 100%; }
-      .chat-window {
-        display: none; width: 100%; position: fixed; inset: 0; z-index: 20;
-      }
-      .app-container.chat-active .chat-window {
-        display: flex; animation: slideInRight 0.3s var(--ease-ios) forwards;
-      }
-      @keyframes slideInRight {
-        from { transform: translateX(100%); }
-        to { transform: translateX(0); }
-      }
+      .chat-window { display: none; width: 100%; position: fixed; inset: 0; z-index: 20; }
+      .app-container.chat-active .chat-window { display: flex; }
       .back-btn-pill { display: flex; }
       .message { max-width: 85%; }
     }
@@ -497,7 +132,6 @@
 </head>
 <body>
 
-  <!-- Размытые шары на фоне -->
   <div class="ambient-bg">
     <div class="ambient-glow-1"></div>
     <div class="ambient-glow-2"></div>
@@ -505,12 +139,11 @@
 
   <div id="toast-container"></div>
 
-  <!-- Экран входа -->
   <div id="auth-screen">
     <div class="auth-card">
       <div class="brand-badge">F</div>
       <h2>FLEXY</h2>
-      <p>Вход по 4-значному коду из диалога с ботом</p>
+      <p>Вход по 4-значному коду из Telegram бота</p>
       
       <a id="bot-btn" href="https://t.me/FlexyAuthBot" target="_blank" class="bot-link-btn">
         <span>🤖 Открыть Telegram бота</span>
@@ -521,11 +154,9 @@
     </div>
   </div>
 
-  <!-- Главное приложение -->
   <div id="app-screen">
     <div class="app-container" id="app-container">
       
-      <!-- Боковая панель -->
       <div class="sidebar">
         <div class="user-bar">
           <div class="user-info">
@@ -533,9 +164,9 @@
             <span id="my-name">FLEXY</span>
           </div>
           <div class="header-actions">
-            <button class="icon-btn" id="theme-btn" onclick="toggleTheme()" title="Тема">🌙</button>
-            <button class="icon-btn" id="notif-btn" onclick="requestNotificationPermission()" title="Push">🔔</button>
-            <button class="icon-btn" onclick="logout()" title="Выйти">🚪</button>
+            <button class="icon-btn" id="theme-btn" onclick="toggleTheme()">🌙</button>
+            <button class="icon-btn" id="notif-btn" onclick="requestNotificationPermission()">🔔</button>
+            <button class="icon-btn" onclick="logout()">🚪</button>
           </div>
         </div>
         
@@ -547,7 +178,6 @@
         <div class="chats-list" id="chats-list"></div>
       </div>
 
-      <!-- Окно чата -->
       <div class="chat-window">
         <div class="chat-header">
           <div class="header-left">
@@ -560,7 +190,7 @@
               </div>
             </div>
           </div>
-          <button class="icon-btn" id="clear-chat-btn" onclick="clearCurrentChat()" style="display:none;" title="Очистить">🗑️</button>
+          <button class="icon-btn" id="clear-chat-btn" onclick="clearCurrentChat()" style="display:none;">🗑️</button>
         </div>
 
         <div class="messages-area" id="messages-area">
@@ -576,7 +206,7 @@
 
             <input type="text" id="message-input" placeholder="Сообщение..." onkeydown="if(event.key==='Enter') sendTextMessage()">
 
-            <button class="send-circle-btn" onclick="sendTextMessage()" aria-label="Отправить">
+            <button class="send-circle-btn" onclick="sendTextMessage()">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="12" y1="19" x2="12" y2="5"></line>
                 <polyline points="5 12 12 5 19 12"></polyline>
@@ -656,8 +286,6 @@
       document.getElementById('auth-screen').style.display = 'none';
       document.getElementById('app-screen').style.display = 'block';
 
-      checkNotificationPermission();
-
       if (pendingInvite && pendingInvite.toLowerCase() !== currentUser) {
         addFriend(pendingInvite.toLowerCase());
         openChat(pendingInvite.toLowerCase());
@@ -675,23 +303,10 @@
 
     function requestNotificationPermission() {
       unlockAudio();
-      if (!('Notification' in window)) {
-        alert('Уведомления активируются при добавлении приложения на главный экран.');
-        return;
-      }
+      if (!('Notification' in window)) return alert('Уведомления поддерживаются при добавлении на рабочий стол.');
       Notification.requestPermission().then(permission => {
         if (permission === 'granted') alert('Уведомления включены!');
-        checkNotificationPermission();
       });
-    }
-
-    function checkNotificationPermission() {
-      const notifBtn = document.getElementById('notif-btn');
-      if ('Notification' in window && Notification.permission === 'granted') {
-        notifBtn.style.opacity = '1';
-      } else {
-        notifBtn.style.opacity = '0.5';
-      }
     }
 
     function playSound() {
@@ -712,17 +327,10 @@
       } catch (e) {}
     }
 
-    function triggerVibration() {
-      if ('vibrate' in navigator) {
-        try { navigator.vibrate([100, 50, 100]); } catch (e) {}
-      }
-    }
-
     function showInAppToast(sender, content, type) {
       const container = document.getElementById('toast-container');
       const toast = document.createElement('div');
       toast.className = 'toast-banner';
-      
       const bodyText = type === 'image' ? '📷 Фотография' : content;
       
       toast.innerHTML = `
@@ -733,37 +341,14 @@
         </div>
       `;
 
-      toast.onclick = () => {
-        openChat(sender);
-        toast.remove();
-      };
-
+      toast.onclick = () => { openChat(sender); toast.remove(); };
       container.appendChild(toast);
       setTimeout(() => { if (toast.parentNode) toast.remove(); }, 4000);
     }
 
     function triggerMessageNotification(sender, content, type) {
       playSound();
-      triggerVibration();
-
-      if (activeChatUser !== sender) {
-        showInAppToast(sender, content, type);
-      }
-
-      if ('Notification' in window && Notification.permission === 'granted' && document.hidden) {
-        try {
-          const notif = new Notification(`@${sender}`, {
-            body: type === 'image' ? '📷 Фотография' : content,
-            tag: sender,
-            renotify: true
-          });
-          notif.onclick = function() {
-            window.focus();
-            openChat(sender);
-            notif.close();
-          };
-        } catch(e) {}
-      }
+      if (activeChatUser !== sender) showInAppToast(sender, content, type);
     }
 
     function addFriend(username) {
@@ -828,9 +413,7 @@
         const history = chatHistories[u] || [];
         const lastMsg = history.length > 0 ? history[history.length - 1] : null;
         let lastText = 'Нет сообщений';
-        if (lastMsg) {
-          lastText = lastMsg.type === 'image' ? '📷 Фотография' : lastMsg.content;
-        }
+        if (lastMsg) lastText = lastMsg.type === 'image' ? '📷 Фотография' : lastMsg.content;
 
         const d = document.createElement('div');
         d.className = `chat-item ${u === activeChatUser ? 'active' : ''}`;
@@ -863,8 +446,7 @@
         const img = new Image();
         img.onload = () => {
           const canvas = document.createElement('canvas');
-          let width = img.width;
-          let height = img.height;
+          let width = img.width, height = img.height;
           const maxDimension = 1280;
 
           if (width > maxDimension || height > maxDimension) {
@@ -877,8 +459,7 @@
             }
           }
 
-          canvas.width = width;
-          canvas.height = height;
+          canvas.width = width; canvas.height = height;
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, width, height);
 
@@ -940,3 +521,4 @@
   </script>
 </body>
 </html>
+
