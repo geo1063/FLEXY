@@ -4,14 +4,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   
-  <!-- PWA и Standalone режим для iOS / Android (убирает поисковую строку Safari) -->
+  <!-- PWA & Standalone режим для iOS (убирает поисковую строку Safari) -->
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-touch-fullscreen" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="FLEXY">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#000000">
-  
-  <!-- Встроенный Web Manifest прямо в HTML (без создания внешних файлов) -->
+
+  <!-- Встроенная векторная иконка для рабочего стола (гарантирует ярлык с буквой F вместо белого экрана) -->
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' style='background:%230a84ff;'><text x='50%' y='65%' font-size='320' font-weight='bold' fill='white' text-anchor='middle' font-family='sans-serif'>F</text></svg>">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' style='background:%230a84ff;'><text x='50%' y='65%' font-size='320' font-weight='bold' fill='white' text-anchor='middle' font-family='sans-serif'>F</text></svg>">
+
+  <!-- Встроенный Web Manifest -->
   <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22FLEXY%22%2C%22short_name%22%3A%22FLEXY%22%2C%22start_url%22%3A%22%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23000000%22%2C%22theme_color%22%3A%22%23000000%22%7D">
 
   <title>FLEXY</title>
@@ -437,7 +442,7 @@
     let currentUser = '', activeChatUser = null;
     let audioCtx = null;
 
-    // Инициализация / Активация аудио при первом касании экрана (для iOS)
+    // Авто-активация звука при первом клике/касании (обход ограничений iOS Safari)
     function unlockAudio() {
       if (!audioCtx) {
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -520,12 +525,12 @@
     function requestNotificationPermission() {
       unlockAudio();
       if (!('Notification' in window)) {
-        alert('Системные уведомления поддерживаются на iOS при добавлении на экран "Домой" (iOS 16.4+). Внутри приложения баннеры и звук уже работают!');
+        alert('Системные push-уведомления активируются при добавлении сайта на экран "Домой" (iOS 16.4+). Внутренние звуки и карточки сообщений уже работают!');
         return;
       }
       Notification.requestPermission().then(permission => {
         if (permission === 'granted') {
-          alert('Системные уведомления успешно включены!');
+          alert('Системные уведомления включены!');
         } else if (permission === 'denied') {
           alert('Уведомления заблокированы в настройках браузера.');
         }
