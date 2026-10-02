@@ -8,35 +8,85 @@
     :root {
       --bg: #000000;
       --panel: #1c1c1e;
-      --panel-translucent: rgba(28, 28, 30, 0.85);
+      --panel-translucent: rgba(28, 28, 30, 0.88);
       --pill-bg: rgba(255, 255, 255, 0.12);
       --text: #ffffff;
       --text-muted: #8e8e93;
       --accent: #0a84ff;
       --msg-out: #264970;
       --msg-in: #212123;
-      --border: rgba(255, 255, 255, 0.08);
+      --border: rgba(255, 255, 255, 0.1);
       --avatar-bg: #f2a43b;
+      --ease-ios: cubic-bezier(0.25, 1, 0.5, 1);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { background-color: var(--bg); color: var(--text); height: 100vh; height: -webkit-fill-available; overflow: hidden; display: flex; justify-content: center; }
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", sans-serif; 
+      -webkit-tap-highlight-color: transparent; 
+    }
+
+    html, body {
+      background-color: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      height: -webkit-fill-available;
+      overflow: hidden;
+      width: 100%;
+    }
+
+    /* Анимация кнопок */
+    button, .action-btn, .attach-btn-circle, .action-circle-btn, .chat-item {
+      transition: transform 0.12s var(--ease-ios), opacity 0.15s ease, background-color 0.2s ease;
+    }
+    button:active, .action-btn:active, .attach-btn-circle:active, .action-circle-btn:active, .chat-item:active {
+      transform: scale(0.96);
+      opacity: 0.8;
+    }
 
     /* Вход */
-    #auth-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; padding: 20px; background: #0b0b0e; }
-    .auth-card { background: #18181b; padding: 32px 24px; border-radius: 24px; width: 100%; max-width: 360px; text-align: center; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-    .auth-card h2 { margin-bottom: 8px; font-weight: 700; font-size: 28px; letter-spacing: -0.5px; }
+    #auth-screen { 
+      display: flex; 
+      flex-direction: column; 
+      justify-content: center; 
+      align-items: center; 
+      height: 100%; 
+      padding: 20px; 
+      background: #000; 
+    }
+    .auth-card { 
+      background: #1c1c1e; 
+      padding: 32px 24px; 
+      border-radius: 24px; 
+      width: 100%; 
+      max-width: 360px; 
+      text-align: center; 
+      border: 1px solid var(--border); 
+      box-shadow: 0 12px 40px rgba(0,0,0,0.6); 
+      animation: slideUp 0.4s var(--ease-ios) forwards;
+    }
+    .auth-card h2 { margin-bottom: 8px; font-weight: 700; font-size: 28px; }
     .auth-card p { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.4; }
     .bot-link-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 14px; background: #2AABEE; color: white; text-decoration: none; border-radius: 14px; font-weight: 600; font-size: 15px; margin-bottom: 14px; }
     .auth-card input { width: 100%; padding: 14px; background: #000; border: 1px solid var(--border); color: var(--text); border-radius: 14px; font-size: 20px; outline: none; margin-bottom: 14px; text-align: center; letter-spacing: 4px; }
     .auth-card button { width: 100%; padding: 14px; background: var(--accent); color: white; border: none; border-radius: 14px; font-weight: 600; font-size: 16px; cursor: pointer; }
 
     /* Главный экран */
-    #app-screen { display: none; width: 100%; height: 100vh; height: -webkit-fill-available; }
-    .app-container { display: flex; width: 100%; height: 100%; }
+    #app-screen { display: none; width: 100%; height: 100%; }
+    .app-container { display: flex; width: 100%; height: 100%; position: relative; }
 
     /* Боковая панель */
-    .sidebar { width: 320px; background: #121214; border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+    .sidebar { 
+      width: 320px; 
+      background: #121214; 
+      border-right: 1px solid var(--border); 
+      display: flex; 
+      flex-direction: column; 
+      height: 100%;
+      flex-shrink: 0;
+    }
     .user-bar { padding: 14px 16px; font-weight: 700; color: #fff; font-size: 18px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: #18181a; }
     .header-actions { display: flex; gap: 12px; align-items: center; }
     .icon-btn { background: none; border: none; font-size: 18px; cursor: pointer; color: var(--text-muted); }
@@ -45,24 +95,32 @@
     .action-btn { width: 100%; padding: 10px; background: var(--accent); color: white; border: none; border-radius: 12px; font-weight: 600; font-size: 13px; cursor: pointer; }
     .action-btn.secondary { background: var(--pill-bg); color: var(--text); border: 1px solid var(--border); }
 
-    .chats-list { flex: 1; overflow-y: auto; }
+    .chats-list { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
     .chat-item { padding: 14px 16px; cursor: pointer; border-bottom: 1px solid var(--border); font-weight: 500; display: flex; align-items: center; gap: 12px; }
     .chat-item.active { background: #1f1f22; }
     .chat-item-avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--avatar-bg); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; flex-shrink: 0; }
 
     /* Окно чата */
-    .chat-window { flex: 1; display: flex; flex-direction: column; background: #0c0c0e; position: relative; }
+    .chat-window { 
+      flex: 1; 
+      display: flex; 
+      flex-direction: column; 
+      background: #000000; 
+      position: relative; 
+      height: 100%; 
+      overflow: hidden;
+    }
     
-    /* Узор фона Telegram */
     .chat-bg-pattern {
-      position: absolute; inset: 0; opacity: 0.12; pointer-events: none;
-      background-image: radial-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 0);
-      background-size: 18px 18px;
+      position: absolute; inset: 0; opacity: 0.08; pointer-events: none;
+      background-image: radial-gradient(rgba(255, 255, 255, 0.2) 1px, transparent 0);
+      background-size: 20px 20px;
     }
 
-    /* Шапка чата как в Telegram iOS */
+    /* Шапка чата */
     .chat-header {
       padding: 10px 16px;
+      padding-top: max(10px, env(safe-area-inset-top));
       background: var(--panel-translucent);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
@@ -71,6 +129,7 @@
       align-items: center;
       justify-content: space-between;
       z-index: 10;
+      flex-shrink: 0;
     }
 
     .header-left { display: flex; align-items: center; gap: 8px; }
@@ -102,9 +161,15 @@
 
     /* Сообщения */
     .messages-area {
-      flex: 1; padding: 16px; overflow-y: auto;
-      display: flex; flex-direction: column; gap: 10px;
-      z-index: 2; -webkit-overflow-scrolling: touch;
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 2;
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: smooth;
     }
 
     .system-date-pill {
@@ -117,64 +182,124 @@
       margin: 8px 0; text-align: center;
     }
 
+    /* Анимация сообщений */
+    @keyframes fadeInMsg {
+      from { opacity: 0; transform: translateY(10px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
     .message {
-      max-width: 75%; padding: 8px 12px; border-radius: 18px;
-      font-size: 15px; line-height: 1.35; word-break: break-word; position: relative;
+      max-width: 78%; 
+      padding: 9px 13px; 
+      border-radius: 18px;
+      font-size: 15px; 
+      line-height: 1.35; 
+      word-break: break-word; 
+      position: relative;
+      animation: fadeInMsg 0.22s var(--ease-ios) forwards;
     }
     .message.sent {
-      background: var(--msg-out); align-self: flex-end;
-      border-bottom-right-radius: 4px; color: #fff;
+      background: var(--msg-out); 
+      align-self: flex-end;
+      border-bottom-right-radius: 4px; 
+      color: #fff;
     }
     .message.received {
-      background: var(--msg-in); align-self: flex-start;
-      border-bottom-left-radius: 4px; color: #fff;
+      background: var(--msg-in); 
+      align-self: flex-start;
+      border-bottom-left-radius: 4px; 
+      color: #fff;
     }
     .message img { max-width: 100%; max-height: 280px; border-radius: 12px; margin-top: 4px; display: block; }
     .message .time { font-size: 10px; color: rgba(255, 255, 255, 0.5); text-align: right; margin-top: 2px; }
 
-    /* Панель ввода в стиле Telegram iOS */
+    /* Панель ввода */
     .input-area {
-      padding: 8px 12px;
-      padding-bottom: max(8px, env(safe-area-inset-bottom));
+      padding: 10px 14px;
+      padding-bottom: max(10px, env(safe-area-inset-bottom));
       background: var(--panel-translucent);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      display: flex; gap: 8px; align-items: center;
-      border-top: 1px solid var(--border); z-index: 10;
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      border-top: 1px solid var(--border);
+      z-index: 10;
+      flex-shrink: 0;
+      width: 100%;
     }
 
     .attach-btn-circle {
-      width: 38px; height: 38px; border-radius: 50%;
-      background: var(--pill-bg); display: flex;
-      align-items: center; justify-content: center;
-      color: #fff; font-size: 18px; cursor: pointer; flex-shrink: 0;
+      width: 38px; 
+      height: 38px; 
+      border-radius: 50%;
+      background: var(--pill-bg); 
+      display: flex;
+      align-items: center; 
+      justify-content: center;
+      color: #fff; 
+      font-size: 18px; 
+      cursor: pointer; 
+      flex-shrink: 0;
     }
 
     .input-capsule {
-      flex: 1; display: flex; align-items: center;
-      background: var(--pill-bg); border-radius: 20px;
-      padding: 0 14px; border: 1px solid var(--border);
+      flex: 1; 
+      display: flex; 
+      align-items: center;
+      background: rgba(255, 255, 255, 0.08); 
+      border-radius: 20px;
+      padding: 0 16px; 
+      border: 1px solid var(--border);
     }
     .input-capsule input {
-      flex: 1; background: none; border: none; outline: none;
-      color: #fff; font-size: 16px; padding: 10px 0;
+      flex: 1; 
+      background: none; 
+      border: none; 
+      outline: none;
+      color: #fff; 
+      font-size: 16px; 
+      padding: 9px 0;
     }
     .input-capsule input::placeholder { color: var(--text-muted); }
-    .input-icons { display: flex; gap: 8px; color: var(--text-muted); font-size: 15px; }
 
     .action-circle-btn {
-      width: 38px; height: 38px; border-radius: 50%;
-      background: var(--pill-bg); border: none; color: #fff;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 16px; cursor: pointer; flex-shrink: 0;
+      width: 36px; 
+      height: 36px; 
+      border-radius: 50%;
+      background: var(--accent); 
+      border: none; 
+      color: #fff;
+      display: flex; 
+      align-items: center; 
+      justify-content: center;
+      cursor: pointer; 
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(10, 132, 255, 0.4);
     }
-    .action-circle-btn.send { background: var(--accent); }
 
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Адаптация под моб. устройства */
     @media (max-width: 768px) {
-      .sidebar { width: 100%; }
-      .chat-window { display: none; width: 100%; }
-      .app-container.chat-active .sidebar { display: none; }
-      .app-container.chat-active .chat-window { display: flex; }
+      .sidebar { 
+        width: 100%; 
+        transition: transform 0.3s var(--ease-ios);
+      }
+      .chat-window { 
+        display: none; 
+        width: 100%; 
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        z-index: 20;
+      }
+      .app-container.chat-active .chat-window { 
+        display: flex; 
+        animation: slideUp 0.28s var(--ease-ios) forwards;
+      }
       .back-btn-pill { display: flex; }
     }
   </style>
@@ -217,11 +342,11 @@
         <div class="chats-list" id="chats-list"></div>
       </div>
 
-      <!-- Чат -->
+      <!-- Окно чата -->
       <div class="chat-window">
         <div class="chat-bg-pattern"></div>
 
-        <!-- Шапка iOS Telegram -->
+        <!-- Шапка -->
         <div class="chat-header">
           <div class="header-left">
             <button class="back-btn-pill" onclick="closeMobileChat()">‹ Назад</button>
@@ -240,22 +365,24 @@
           <div class="system-date-pill">Выберите чат слева</div>
         </div>
 
-        <!-- Нижняя панель ввода Telegram -->
+        <!-- Нижняя панель ввода -->
         <div class="input-area" id="input-area" style="visibility: hidden;">
-          <label class="attach-btn-circle">
+          <label class="attach-btn-circle" title="Прикрепить фото">
             📎
             <input type="file" id="file-input" accept="image/*" style="display:none;" onchange="sendPhoto(event)">
           </label>
 
           <div class="input-capsule">
             <input type="text" id="message-input" placeholder="Публикация..." onkeydown="if(event.key==='Enter') sendTextMessage()">
-            <div class="input-icons">
-              <span>🔔</span>
-              <span>🌙</span>
-            </div>
           </div>
 
-          <button class="action-circle-btn send" onclick="sendTextMessage()">🎤</button>
+          <!-- Стрелка вверх (iOS style) -->
+          <button class="action-circle-btn" onclick="sendTextMessage()" aria-label="Отправить">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="19" x2="12" y2="5"></line>
+              <polyline points="5 12 12 5 19 12"></polyline>
+            </svg>
+          </button>
         </div>
       </div>
 
