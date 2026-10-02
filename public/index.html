@@ -5,32 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>FLEXY</title>
   <style>
-    /* Переменные авто-темы (системная синхронизация) */
     :root {
-      --bg: #ffffff;
-      --panel: #f4f4f5;
-      --text: #000000;
-      --text-muted: #707579;
-      --accent: #007aff;
-      --msg-out: #e3f2fd;
-      --msg-in: #f0f0f0;
-      --border: #e5e5ea;
+      --bg: #ffffff; --panel: #f4f4f5; --text: #000000; --text-muted: #707579;
+      --accent: #007aff; --msg-out: #e3f2fd; --msg-in: #f0f0f0; --border: #e5e5ea;
     }
 
     @media (prefers-color-scheme: dark) {
       :root {
-        --bg: #0e1621;
-        --panel: #17212b;
-        --text: #f5f5f5;
-        --text-muted: #7f91a4;
-        --accent: #5288c1;
-        --msg-out: #2b5278;
-        --msg-in: #182533;
-        --border: #101921;
+        --bg: #0e1621; --panel: #17212b; --text: #f5f5f5; --text-muted: #7f91a4;
+        --accent: #5288c1; --msg-out: #2b5278; --msg-in: #182533; --border: #101921;
       }
     }
 
-    /* Ручное переключение тем */
     body.theme-dark {
       --bg: #0e1621; --panel: #17212b; --text: #f5f5f5; --text-muted: #7f91a4;
       --accent: #5288c1; --msg-out: #2b5278; --msg-in: #182533; --border: #101921;
@@ -41,26 +27,24 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { background-color: var(--bg); color: var(--text); height: 100vh; height: -webkit-fill-available; overflow: hidden; display: flex; justify-content: center; transition: background 0.3s; }
+    body { background-color: var(--bg); color: var(--text); height: 100vh; height: -webkit-fill-available; overflow: hidden; display: flex; justify-content: center; }
 
-    /* Окно входа */
     #auth-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; padding: 20px; }
     .auth-card { background: var(--panel); padding: 30px; border-radius: 20px; width: 100%; max-width: 360px; text-align: center; border: 1px solid var(--border); }
-    .auth-card h2 { margin-bottom: 6px; font-weight: 700; font-size: 26px; color: var(--text); }
+    .auth-card h2 { margin-bottom: 6px; font-weight: 700; font-size: 26px; }
     .auth-card p { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.4; }
-    .auth-card input { width: 100%; padding: 14px; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 12px; font-size: 16px; outline: none; margin-bottom: 12px; text-align: center; }
+    .bot-link-btn { display: block; width: 100%; padding: 14px; background: #2AABEE; color: white; text-decoration: none; border-radius: 12px; font-weight: 600; font-size: 15px; margin-bottom: 14px; }
+    .auth-card input { width: 100%; padding: 14px; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 12px; font-size: 18px; outline: none; margin-bottom: 12px; text-align: center; letter-spacing: 2px; }
     .auth-card button { width: 100%; padding: 14px; background: var(--accent); color: white; border: none; border-radius: 12px; font-weight: 600; font-size: 16px; cursor: pointer; }
 
-    /* Главный экран */
     #app-screen { display: none; width: 100%; height: 100vh; height: -webkit-fill-available; }
     .app-container { display: flex; width: 100%; height: 100%; }
 
     .sidebar { width: 320px; background: var(--panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
-    .user-bar { padding: 16px; background: var(--panel); font-weight: 700; color: var(--accent); font-size: 18px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-    
+    .user-bar { padding: 16px; font-weight: 700; color: var(--accent); font-size: 18px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
     .theme-toggle-btn { background: none; border: none; font-size: 18px; cursor: pointer; }
     
-    .invite-box { padding: 14px; text-align: center; }
+    .invite-box { padding: 14px; }
     .invite-btn { width: 100%; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 10px; font-weight: 600; font-size: 14px; cursor: pointer; }
 
     .chats-list { flex: 1; overflow-y: auto; }
@@ -98,34 +82,26 @@
   <div id="auth-screen">
     <div class="auth-card">
       <h2>FLEXY</h2>
-      <p id="auth-desc">Введите ваш @username в Telegram для получения кода</p>
+      <p>Нажмите кнопку ниже, чтобы получить код в Telegram</p>
       
-      <div id="step-1">
-        <input type="text" id="username-input" placeholder="@username" autocomplete="off" autocapitalize="off">
-        <button onclick="requestCode()">Запросить код</button>
-      </div>
+      <a id="bot-btn" href="https://t.me/FlexyAuthBot" target="_blank" class="bot-link-btn">1. Получить код в Telegram 🤖</a>
 
-      <div id="step-2" style="display: none;">
-        <input type="number" id="code-input" placeholder="Код из Telegram" autocomplete="off">
-        <button onclick="verifyCode()">Войти в FLEXY</button>
-      </div>
+      <input type="number" id="code-input" placeholder="Введите код" autocomplete="off">
+      <button onclick="verifyCode()">Войти в FLEXY</button>
     </div>
   </div>
 
   <!-- Главный экран -->
   <div id="app-screen">
     <div class="app-container" id="app-container">
-      
       <div class="sidebar">
         <div class="user-bar">
           <span>FLEXY</span>
-          <button class="theme-toggle-btn" onclick="toggleTheme()" title="Сменить тему">🌙</button>
+          <button class="theme-toggle-btn" onclick="toggleTheme()">🌙</button>
         </div>
-        
         <div class="invite-box">
           <button class="invite-btn" onclick="copyInviteLink()">🔗 Скопировать ссылку-инвайт</button>
         </div>
-
         <div class="chats-list" id="chats-list"></div>
       </div>
 
@@ -134,16 +110,13 @@
           <button class="back-btn" onclick="closeMobileChat()">‹ Назад</button>
           <span id="chat-title">Выберите чат</span>
         </div>
-        
         <div class="messages-area" id="messages-area"></div>
-
         <div class="input-area" id="input-area" style="visibility: hidden;">
           <label class="attach-btn">📷<input type="file" id="file-input" accept="image/*" style="display:none;" onchange="sendPhoto(event)"></label>
           <input type="text" id="message-input" placeholder="Сообщение..." onkeydown="if(event.key==='Enter') sendTextMessage()">
           <button class="send-btn" onclick="sendTextMessage()">Отправ.</button>
         </div>
       </div>
-
     </div>
   </div>
 
@@ -153,32 +126,13 @@
     let currentUser = '', activeChatUser = null;
     const chatHistories = {};
 
-    // Запоминаем инвайт из URL (?invite=username)
     const urlParams = new URLSearchParams(window.location.search);
     const pendingInvite = urlParams.get('invite');
 
-    function requestCode() {
-      const user = document.getElementById('username-input').value.trim();
-      if (!user) return alert('Введите ваш username');
-      currentUser = user.replace(/^@/, '');
-      socket.emit('request_code', currentUser);
-    }
-
-    socket.on('code_sent', ({ success, error }) => {
-      if (success) {
-        document.getElementById('step-1').style.display = 'none';
-        document.getElementById('step-2').style.display = 'block';
-        document.getElementById('auth-desc').innerText = `Код отправлен в Telegram на @${currentUser}`;
-      } else {
-        alert(error);
-      }
-    });
-
     function verifyCode() {
       const code = document.getElementById('code-input').value.trim();
-      if (code) {
-        socket.emit('verify_code', { username: currentUser, code });
-      }
+      if (!code) return alert('Введите 4-значный код');
+      socket.emit('verify_code', code);
     }
 
     socket.on('auth_error', (msg) => alert(msg));
@@ -188,7 +142,6 @@
       document.getElementById('auth-screen').style.display = 'none';
       document.getElementById('app-screen').style.display = 'block';
 
-      // Если зашли по инвайт-ссылке, сразу открываем диалог с другом
       if (pendingInvite && pendingInvite.toLowerCase() !== currentUser.toLowerCase()) {
         openChat(pendingInvite.toLowerCase());
       }
@@ -197,7 +150,7 @@
     function copyInviteLink() {
       const link = `${window.location.origin}?invite=${currentUser}`;
       navigator.clipboard.writeText(link);
-      alert('Инвайт-ссылка скопирована! Отправьте её другу.');
+      alert('Инвайт-ссылка скопирована!');
     }
 
     function openChat(username) {
@@ -267,18 +220,13 @@
       area.scrollTop = area.scrollHeight;
     }
 
-    // Переключатель темы
     function toggleTheme() {
-      if (document.body.classList.contains('theme-dark')) {
-        document.body.classList.remove('theme-dark');
-        document.body.classList.add('theme-light');
-      } else {
-        document.body.classList.remove('theme-light');
-        document.body.classList.add('theme-dark');
-      }
+      document.body.classList.toggle('theme-dark');
+      document.body.classList.toggle('theme-light');
     }
 
     function escapeHTML(s) { return s.replace(/[&<>'"]/g, t => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[t]||t)); }
   </script>
 </body>
 </html>
+
