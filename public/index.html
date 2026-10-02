@@ -237,8 +237,10 @@
     window.addEventListener('touchstart', unlockAudio, { once: true });
     window.addEventListener('click', unlockAudio, { once: true });
 
-    const savedTheme = localStorage.getItem('flexy_theme') || 'dark';
-    applyTheme(savedTheme);
+    // 🌗 Синхронизация с системой
+    function getSystemTheme() {
+      return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+    }
 
     function applyTheme(theme) {
       if (theme === 'light') {
@@ -250,10 +252,22 @@
       }
     }
 
+    // Загрузка темы (если вручную не меняли — берется системная)
+    const savedTheme = localStorage.getItem('flexy_theme') || getSystemTheme();
+    applyTheme(savedTheme);
+
+    // Следим за изменениями системной темы ОС
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+      if (!localStorage.getItem('flexy_theme')) {
+        applyTheme(e.matches ? 'dark' : 'light');
+      }
+    });
+
     function toggleTheme() {
-      const current = localStorage.getItem('flexy_theme') === 'light' ? 'dark' : 'light';
-      localStorage.setItem('flexy_theme', current);
-      applyTheme(current);
+      const isLight = document.body.classList.contains('light-theme');
+      const nextTheme = isLight ? 'dark' : 'light';
+      localStorage.setItem('flexy_theme', nextTheme);
+      applyTheme(nextTheme);
     }
 
     let chatHistories = JSON.parse(localStorage.getItem('flexy_chat_histories') || '{}');
@@ -262,7 +276,6 @@
     const urlParams = new URLSearchParams(window.location.search);
     const pendingInvite = urlParams.get('invite');
 
-    // 🎯 Жесткое разделение экранов для телефонов
     function syncView() {
       const isMobile = window.innerWidth <= 768;
       const sidebar = document.getElementById('sidebar-view');
