@@ -9,13 +9,19 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, { maxHttpBufferSize: 1e7 });
 
-app.use(express.static(path.join(__dirname, 'public')));
+// Запрещаем браузерам кэшировать файлы, чтобы изменения применялись мгновенно
+app.use(express.static(path.join(__dirname, 'public'), {
+  etag: false,
+  maxAge: 0,
+  setHeaders: (res) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+  }
+}));
 
 const users = new Map();        // username -> socket.id
 const socketToUser = new Map(); // socket.id -> username
 const pendingCodes = new Map(); // code -> username
 
-// Опрос Telegram бота
 let lastUpdateId = 0;
 async function pollTelegram() {
   try {
@@ -51,7 +57,6 @@ async function pollTelegram() {
 pollTelegram();
 
 io.on('connection', (socket) => {
-  // Авторизация по коду
   socket.on('verify_code', (code) => {
     const username = pendingCodes.get(code.trim());
     if (username) {
@@ -64,7 +69,6 @@ io.on('connection', (socket) => {
     }
   });
 
-  // Автоматический вход сохраненного пользователя
   socket.on('auto_login', (username) => {
     const cleanUser = username.trim().toLowerCase().replace(/^@/, '');
     if (!cleanUser) return;
@@ -73,7 +77,6 @@ io.on('connection', (socket) => {
     socket.emit('registered', { username: cleanUser });
   });
 
-  // Отправка сообщений
   socket.on('private_message', ({ to, content, type }) => {
     const sender = socketToUser.get(socket.id);
     const targetSocketId = users.get(to.toLowerCase().replace(/^@/, ''));
