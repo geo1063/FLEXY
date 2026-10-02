@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Telegram Lite</title>
+  <style>
+    :root {
+      --bg-dark: #0e1621;
+      --panel-dark: #17212b;
+      --accent: #5288c1;
+      --text: #f5f5f5;
+      --text-muted: #7f91a4;
+      --msg-out: #2b5278;
+      --msg-in: #182533;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background-color: var(--bg-dark); color: var(--text); height: 100vh; height: -webkit-fill-available; overflow: hidden; display: flex; justify-content: center; }
+    #auth-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; padding: 20px; }
+    .auth-card { background: var(--panel-dark); padding: 30px; border-radius: 16px; width: 100%; max-width: 360px; text-align: center; }
+    .auth-card h2 { margin-bottom: 8px; font-weight: 600; color: #fff; }
+    .auth-card p { font-size: 14px; color: var(--text-muted); margin-bottom: 20px; }
+    .auth-card input { width: 100%; padding: 14px; background: var(--bg-dark); border: 1px solid #242f3d; color: #fff; border-radius: 10px; font-size: 16px; outline: none; margin-bottom: 15px; text-align: center; }
+    .auth-card button { width: 100%; padding: 14px; background: var(--accent); color: white; border: none; border-radius: 10px; font-weight: 600; font-size: 16px; cursor: pointer; }
+    #app-screen { display: none; width: 100%; height: 100vh; height: -webkit-fill-available; }
+    .app-container { display: flex; width: 100%; height: 100%; }
+    .sidebar { width: 320px; background: var(--panel-dark); border-right: 1px solid #101921; display: flex; flex-direction: column; }
+    .user-bar { padding: 16px; background: #202b36; font-weight: 600; color: var(--accent); font-size: 15px; }
+    .search-bar { padding: 10px; }
+    .search-bar input { width: 100%; padding: 10px 14px; background: var(--bg-dark); border: none; color: #fff; border-radius: 8px; font-size: 15px; outline: none; }
+    .chats-list { flex: 1; overflow-y: auto; }
+    .chat-item { padding: 14px 16px; cursor: pointer; border-bottom: 1px solid #101921; font-weight: 500; }
+    .chat-item.active { background: #202b36; }
+    .chat-window { flex: 1; display: flex; flex-direction: column; background: var(--bg-dark); }
+    .chat-header { padding: 14px 20px; background: var(--panel-dark); font-weight: 600; border-bottom: 1px solid #101921; display: flex; align-items: center; }
+    .back-btn { display: none; background: none; border: none; color: var(--accent); font-size: 16px; padding-right: 12px; }
+    .messages-area { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; -webkit-overflow-scrolling: touch; }
+    .message { max-width: 75%; padding: 8px 12px; border-radius: 14px; font-size: 15px; line-height: 1.4; word-break: break-word; }
+    .message.sent { background: var(--msg-out); align-self: flex-end; border-bottom-right-radius: 4px; }
+    .message.received { background: var(--msg-in); align-self: flex-start; border-bottom-left-radius: 4px; }
+    .message img { max-width: 100%; max-height: 280px; border-radius: 10px; margin-top: 4px; display: block; object-fit: cover; }
+    .message .time { font-size: 10px; color: var(--text-muted); text-align: right; margin-top: 2px; }
+    .input-area { padding: 10px 14px; padding-bottom: max(10px, env(safe-area-inset-bottom)); background: var(--panel-dark); display: flex; gap: 10px; align-items: center; }
+    .input-area input[type="text"] { flex: 1; padding: 10px 14px; background: var(--bg-dark); border: none; color: #fff; border-radius: 20px; font-size: 16px; outline: none; }
+    .attach-btn { color: var(--accent); font-size: 22px; }
+    .send-btn { background: none; border: none; color: var(--accent); font-weight: 600; font-size: 16px; }
+    @media (max-width: 768px) {
+      .sidebar { width: 100%; }
+      .chat-window { display: none; width: 100%; }
+      .app-container.chat-active .sidebar { display: none; }
+      .app-container.chat-active .chat-window { display: flex; }
+      .back-btn { display: block; }
+    }
+  </style>
+</head>
+<body>
+  <div id="auth-screen">
+    <div class="auth-card">
+      <h2>Telegram Lite</h2>
+      <p>Введите ваш @username</p>
+      <input type="text" id="username-input" placeholder="например: alex" autocomplete="off" autocapitalize="off">
+      <button onclick="login()">Войти</button>
+    </div>
+  </div>
+  <div id="app-screen">
+    <div class="app-container" id="app-container">
+      <div class="sidebar">
+        <div class="user-bar" id="my-username">@username</div>
+        <div class="search-bar">
+          <input type="text" id="search-input" placeholder="Поиск по @username..." onkeydown="if(event.key==='Enter') searchUser()">
+        </div>
+        <div class="chats-list" id="chats-list"></div>
+      </div>
+      <div class="chat-window">
+        <div class="chat-header">
+          <button class="back-btn" onclick="closeMobileChat()">‹ Назад</button>
+          <span id="chat-title">Выберите чат</span>
+        </div>
+        <div class="messages-area" id="messages-area"></div>
+        <div class="input-area" id="input-area" style="visibility: hidden;">
+          <label class="attach-btn">📷<input type="file" id="file-input" accept="image/*" style="display:none;" onchange="sendPhoto(event)"></label>
+          <input type="text" id="message-input" placeholder="Сообщение..." onkeydown="if(event.key==='Enter') sendTextMessage()">
+          <button class="send-btn" onclick="sendTextMessage()">Отправ.</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    let currentUser = '', activeChatUser = null;
+    const chatHistories = {};
+    function login() {
+      const val = document.getElementById('username-input').value.trim();
+      if (val) socket.emit('register', val);
+    }
+    socket.on('registered', ({ username }) => {
+      currentUser = username;
+      document.getElementById('my-username').innerText = `@${username}`;
+      document.getElementById('auth-screen').style.display = 'none';
+      document.getElementById('app-screen').style.display = 'block';
+    });
+    function searchUser() {
+      const q = document.getElementById('search-input').value.trim();
+      if (q) socket.emit('search_user', q);
+    }
+    socket.on('search_result', ({ username, exists }) => {
+      if (!exists) return alert(`Пользователь @${username} оффлайн или не найден.`);
+      document.getElementById('search-input').value = '';
+      openChat(username);
+    });
+    function openChat(username) {
+      activeChatUser = username;
+      if (!chatHistories[username]) chatHistories[username] = [];
+      document.getElementById('chat-title').innerText = `@${username}`;
+      document.getElementById('input-area').style.visibility = 'visible';
+      document.getElementById('app-container').classList.add('chat-active');
+      updateChatsList(); renderMessages();
+    }
+    function closeMobileChat() { document.getElementById('app-container').classList.remove('chat-active'); }
+    function updateChatsList() {
+      const list = document.getElementById('chats-list'); list.innerHTML = '';
+      Object.keys(chatHistories).forEach(u => {
+        const d = document.createElement('div');
+        d.className = `chat-item ${u === activeChatUser ? 'active' : ''}`;
+        d.innerText = `@${u}`;
+        d.onclick = () => openChat(u);
+        list.appendChild(d);
+      });
+    }
+    function sendTextMessage() {
+      const el = document.getElementById('message-input');
+      if (el.value.trim() && activeChatUser) {
+        socket.emit('private_message', { to: activeChatUser, content: el.value.trim(), type: 'text' });
+        el.value = '';
+      }
+    }
+    function sendPhoto(e) {
+      const file = e.target.files[0];
+      if (!file || !activeChatUser) return;
+      const r = new FileReader();
+      r.onload = (evt) => {
+        socket.emit('private_message', { to: activeChatUser, content: evt.target.result, type: 'image' });
+        e.target.value = '';
+      };
+      r.readAsDataURL(file);
+    }
+    socket.on('message_sent', handleIncoming);
+    socket.on('receive_message', handleIncoming);
+    function handleIncoming(data) {
+      const partner = data.sender === currentUser ? data.to : data.sender;
+      if (!chatHistories[partner]) chatHistories[partner] = [];
+      chatHistories[partner].push(data);
+      if (activeChatUser === partner) renderMessages();
+      updateChatsList();
+    }
+    function renderMessages() {
+      const area = document.getElementById('messages-area'); area.innerHTML = '';
+      if (!activeChatUser || !chatHistories[activeChatUser]) return;
+      chatHistories[activeChatUser].forEach(m => {
+        const d = document.createElement('div');
+        d.className = `message ${m.sender === currentUser ? 'sent' : 'received'}`;
+        d.innerHTML = `${m.type === 'text' ? '<div>'+escapeHTML(m.content)+'</div>' : '<img src="'+m.content+'">'}<div class="time">${m.time}</div>`;
+        area.appendChild(d);
+      });
+      area.scrollTop = area.scrollHeight;
+    }
+    function escapeHTML(s) { return s.replace(/[&<>'"]/g, t => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[t]||t)); }
+  </script>
+</body>
+</html>
