@@ -1,130 +1,122 @@
 const express = require('express');
 const http = require('http');
-const https = require('https');
 const { Server } = require('socket.io');
-const path = require('path');
-
-const TG_BOT_TOKEN = '8957995967:AAHMGLzAEfC5UJL4CARs0TG_IK9K5TEWEMg';
+const TelegramBot = require('node-telegram-bot-api');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, { maxHttpBufferSize: 1e7 });
 
-app.use(express.static(path.join(__dirname, 'public'), {
-  etag: false,
-  maxAge: 0,
-  setHeaders: (res) => {
-    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
-  }
-}));
+// Настройка Socket.io с поддержкой отправки файлов (до 100 МБ)
+// и устойчивым соединением для мобильных устройств
+const io = new Server(server, {
+  maxHttpBufferSize: 1e8, // 100 MB
+  pingTimeout: 60000,
+  pingInterval: 25000
+});
 
-const users = new Map();        // username -> socket.id
-const socketToUser = new Map(); // socket.id -> username
-const pendingCodes = new Map(); // code -> username
+// Токен бота
+const TELEGRAM_BOT_TOKEN = '8957995967:AAHMGLzAEfC5UJL4CARs0TG_IK9K5TEWEMg'; 
 
-// Нативный запрос к Telegram без сторонних библиотек и fetch
-function tgRequest(endpoint, body) {
-  return new Promise((resolve) => {
-    const data = JSON.stringify(body);
-    const req = https.request(`https://api.telegram.org/bot${TG_BOT_TOKEN}/${endpoint}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(data)
-      }
-    }, (res) => {
-      let raw = '';
-      res.on('data', chunk => raw += chunk);
-      res.on('end', () => {
-        try { resolve(JSON.parse(raw)); } catch (e) { resolve(null); }
-      });
+let bot;
+if (TELEGRAM_BOT_TOKEN && TELEGRAM_BOT_TOKEN !== 'ВАШ_TELEGRAM_BOT_TOKEN') {
+  bot = new TelegramBot(TELEGRAM_BOT_TOKEN, { polling: true });
+  console.log('🤖 Telegram бот успешно запущен');
+} else {
+  console.log('⚠️ Токен Telegram бота не указан в server.js!');
+}
+
+// Хранилище сгенерированных кодов авторизации { "1234": "username" }
+const pendingCodes = {};
+// Активные сокеты онлайн-пользователей { "username": "socket_id" }
+const onlineUsers = {};
+
+// 1. Обработка команды /start в Telegram Ботe
+if (bot) {
+  bot.onText(/\/start/, (msg) => {
+    const chatId = msg.chat.id;
+    const username = msg.from.username || msg.from.first_name || `user_${msg.from.id}`;
+    
+    // Генерация случайного 4-значного кода
+    const authCode = Math.floor(1000 + Math.random() * 9000).toString();
+    
+    // Код действителен 5 минут
+    pendingCodes[authCode] = username.toLowerCase();
+    setTimeout(() => delete pendingCodes[authCode], 5 * 60 * 1000);
+
+    // Отправка кода пользователю в диалог с ботом
+    bot.sendMessage(chatId, `🔑 Ваш код для входа в FLEXY: *${authCode}*`, {
+      parse_mode: 'Markdown'
     });
-    req.on('error', () => resolve(null));
-    req.write(data);
-    req.end();
   });
 }
 
-let lastUpdateId = 0;
-async function pollTelegram() {
-  try {
-    const data = await tgRequest('getUpdates', { offset: lastUpdateId + 1, timeout: 5 });
-    if (data && data.ok && data.result) {
-      for (const update of data.result) {
-        lastUpdateId = update.update_id;
-        if (update.message) {
-          const chatId = update.message.chat.id;
-          const username = update.message.from.username || `id_${chatId}`;
-          const code = Math.floor(1000 + Math.random() * 9000).toString();
-          
-          pendingCodes.set(code, username.toLowerCase());
+// Раздача статичных файлов из папки public
+app.use(express.static('public'));
 
-          await tgRequest('sendMessage', {
-            chat_id: chatId,
-            text: `🔐 Ваш код для входа в FLEXY: ${code}`
-          });
-        }
-      }
-    }
-  } catch (e) {
-    console.error('Ошибка бота:', e);
-  }
-  setTimeout(pollTelegram, 2000);
-}
-
-pollTelegram();
-
+// 2. Обработка Socket.io соединений
 io.on('connection', (socket) => {
+
+  // Привязка логина пользователя к текущему сокету
+  function registerUser(username) {
+    const cleanUser = username.toLowerCase();
+    socket.username = cleanUser;
+    onlineUsers[cleanUser] = socket.id;
+  }
+
+  // Вход по 4-значному коду из Telegram
   socket.on('verify_code', (code) => {
-    const username = pendingCodes.get(code.trim());
+    const username = pendingCodes[code];
+    
     if (username) {
-      pendingCodes.delete(code.trim());
-      users.set(username, socket.id);
-      socketToUser.set(socket.id, username);
+      delete pendingCodes[code]; // Одноразовое использование
+      registerUser(username);
       socket.emit('registered', { username });
     } else {
-      socket.emit('auth_error', 'Неверный или устаревший код!');
+      socket.emit('auth_error', 'Неверный или истекший код. Отправьте /start боту еще раз.');
     }
   });
 
+  // Автоматический вход / повторная авторизация при переподключении
   socket.on('auto_login', (username) => {
-    const cleanUser = username.trim().toLowerCase().replace(/^@/, '');
-    if (!cleanUser) return;
-    users.set(cleanUser, socket.id);
-    socketToUser.set(socket.id, cleanUser);
-    socket.emit('registered', { username: cleanUser });
+    if (username) {
+      registerUser(username);
+      socket.emit('registered', { username: username.toLowerCase() });
+    }
   });
 
+  // Отправка личных сообщений и фотографий
   socket.on('private_message', ({ to, content, type }) => {
-    const sender = socketToUser.get(socket.id);
-    if (!sender) {
-      return socket.emit('auth_error', 'Сессия истекла. Перезагрузите страницу.');
-    }
+    const sender = socket.username;
+    if (!sender) return;
 
-    const payload = {
-      sender,
-      to: to.toLowerCase().replace(/^@/, ''),
-      content,
-      type,
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const payload = { 
+      sender, 
+      to: to.toLowerCase(), 
+      content, 
+      type, 
+      time 
     };
 
-    const targetSocketId = users.get(payload.to);
-
+    // Отправляем получателю, если он сейчас онлайн
+    const targetSocketId = onlineUsers[to.toLowerCase()];
     if (targetSocketId) {
       io.to(targetSocketId).emit('receive_message', payload);
     }
+
+    // Подтверждаем отправку отправителю
     socket.emit('message_sent', payload);
   });
 
+  // Обработка отключения
   socket.on('disconnect', () => {
-    const username = socketToUser.get(socket.id);
-    if (username) {
-      users.delete(username);
-      socketToUser.delete(socket.id);
+    if (socket.username && onlineUsers[socket.username] === socket.id) {
+      delete onlineUsers[socket.username];
     }
   });
 });
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`FLEXY запущен на порту ${PORT}`));
+server.listen(PORT, () => {
+  console.log(`🚀 Сервер FLEXY запущен на порту ${PORT}`);
+});
