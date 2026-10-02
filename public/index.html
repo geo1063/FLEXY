@@ -4,14 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   
-  <!-- PWA и Standalone режим для iOS (убирает поисковую строку Safari) -->
+  <!-- PWA и Standalone режим для iOS / Android (убирает поисковую строку Safari) -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="FLEXY">
   <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#000000">
   
-  <!-- Встроенный Web Manifest -->
-  <link rel="manifest" href='data:application/manifest+json,{"name":"FLEXY","short_name":"FLEXY","start_url":"/","display":"standalone","background_color":"#000000","theme_color":"#000000"}'>
+  <!-- Встроенный Web Manifest прямо в HTML (без создания внешних файлов) -->
+  <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22FLEXY%22%2C%22short_name%22%3A%22FLEXY%22%2C%22start_url%22%3A%22%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23000000%22%2C%22theme_color%22%3A%22%23000000%22%7D">
 
   <title>FLEXY</title>
   <style>
@@ -84,7 +85,7 @@
     /* Всплывающие уведомления внутри приложения (Toasts) */
     #toast-container {
       position: fixed;
-      top: 12px;
+      top: max(12px, env(safe-area-inset-top));
       left: 50%;
       transform: translateX(-50%);
       z-index: 9999;
@@ -184,7 +185,6 @@
     }
     .header-actions { display: flex; gap: 10px; align-items: center; }
     .icon-btn { background: none; border: none; font-size: 18px; cursor: pointer; color: var(--text); opacity: 0.8; }
-    .icon-btn:hover { opacity: 1; }
     
     .actions-box { padding: 12px; display: flex; flex-direction: column; gap: 8px; border-bottom: 1px solid var(--border); }
     .action-btn { width: 100%; padding: 10px; background: var(--accent); color: white; border: none; border-radius: 12px; font-weight: 600; font-size: 13px; cursor: pointer; }
@@ -435,6 +435,20 @@
   <script>
     const socket = io();
     let currentUser = '', activeChatUser = null;
+    let audioCtx = null;
+
+    // Инициализация / Активация аудио при первом касании экрана (для iOS)
+    function unlockAudio() {
+      if (!audioCtx) {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (AudioCtx) audioCtx = new AudioCtx();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+    window.addEventListener('touchstart', unlockAudio, { once: true });
+    window.addEventListener('click', unlockAudio, { once: true });
 
     const savedTheme = localStorage.getItem('flexy_theme') || 'dark';
     applyTheme(savedTheme);
@@ -469,6 +483,7 @@
     });
 
     function verifyCode() {
+      unlockAudio();
       const code = document.getElementById('code-input').value.trim();
       if (!code) return alert('Введите код');
       socket.emit('verify_code', code);
@@ -501,19 +516,22 @@
       }
     }
 
-    /* --- Уведомления и Звук --- */
+    /* --- Уведомления, Вибрация и Звук --- */
     function requestNotificationPermission() {
+      unlockAudio();
       if (!('Notification' in window)) {
-        alert('Уведомления включены.');
+        alert('Системные уведомления поддерживаются на iOS при добавлении на экран "Домой" (iOS 16.4+). Внутри приложения баннеры и звук уже работают!');
         return;
       }
       Notification.requestPermission().then(permission => {
         if (permission === 'granted') {
-          alert('Системные push-уведомления включены!');
+          alert('Системные уведомления успешно включены!');
         } else if (permission === 'denied') {
           alert('Уведомления заблокированы в настройках браузера.');
         }
         checkNotificationPermission();
+      }).catch(() => {
+        alert('Уведомления доступны при добавлении сайта на экран "Домой".');
       });
     }
 
@@ -528,25 +546,30 @@
 
     function playSound() {
       try {
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        if (!AudioCtx) return;
-        const ctx = new AudioCtx();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
+        unlockAudio();
+        if (!audioCtx) return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
         
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(587.33, ctx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.15);
+        osc.frequency.setValueAtTime(587.33, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.15);
         
-        gain.gain.setValueAtTime(0.2, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
         
         osc.connect(gain);
-        gain.connect(ctx.destination);
+        gain.connect(audioCtx.destination);
         
         osc.start();
-        osc.stop(ctx.currentTime + 0.15);
+        osc.stop(audioCtx.currentTime + 0.15);
       } catch (e) {}
+    }
+
+    function triggerVibration() {
+      if ('vibrate' in navigator) {
+        try { navigator.vibrate([100, 50, 100]); } catch (e) {}
+      }
     }
 
     function showInAppToast(sender, content, type) {
@@ -570,28 +593,31 @@
       };
 
       container.appendChild(toast);
-      setTimeout(() => toast.remove(), 4000);
+      setTimeout(() => { if (toast.parentNode) toast.remove(); }, 4000);
     }
 
     function triggerMessageNotification(sender, content, type) {
       playSound();
+      triggerVibration();
 
       if (activeChatUser !== sender) {
         showInAppToast(sender, content, type);
       }
 
       if ('Notification' in window && Notification.permission === 'granted' && document.hidden) {
-        const notif = new Notification(`@${sender}`, {
-          body: type === 'image' ? '📷 Фотография' : content,
-          tag: sender,
-          renotify: true
-        });
+        try {
+          const notif = new Notification(`@${sender}`, {
+            body: type === 'image' ? '📷 Фотография' : content,
+            tag: sender,
+            renotify: true
+          });
 
-        notif.onclick = function() {
-          window.focus();
-          openChat(sender);
-          notif.close();
-        };
+          notif.onclick = function() {
+            window.focus();
+            openChat(sender);
+            notif.close();
+          };
+        } catch(e) {}
       }
     }
 
@@ -622,6 +648,7 @@
     }
 
     function openChat(username) {
+      unlockAudio();
       activeChatUser = username.toLowerCase();
       addFriend(activeChatUser);
       if (!chatHistories[activeChatUser]) chatHistories[activeChatUser] = [];
@@ -676,6 +703,7 @@
     }
 
     function sendTextMessage() {
+      unlockAudio();
       const el = document.getElementById('message-input');
       const text = el.value.trim();
       if (!text) return;
@@ -686,6 +714,7 @@
     }
 
     function sendPhoto(e) {
+      unlockAudio();
       const file = e.target.files[0];
       if (!file || !activeChatUser) return;
       const r = new FileReader();
