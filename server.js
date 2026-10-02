@@ -3,7 +3,6 @@ const http = require('http');
 const { Server } = require('socket.io');
 const path = require('path');
 
-// Токен бота сгенерирован и подставлен
 const TG_BOT_TOKEN = '8957995967:AAHMGLzAEfC5UJL4CARs0TG_IK9K5TEWEMg';
 
 const app = express();
@@ -16,7 +15,7 @@ const users = new Map();        // username -> socket.id
 const socketToUser = new Map(); // socket.id -> username
 const pendingCodes = new Map(); // code -> username
 
-// Бот проверяет сообщения в Telegram
+// Опрос Telegram бота
 let lastUpdateId = 0;
 async function pollTelegram() {
   try {
@@ -29,11 +28,9 @@ async function pollTelegram() {
           const chatId = update.message.chat.id;
           const username = update.message.from.username || `id_${chatId}`;
           
-          // Генерируем 4-значный код
           const code = Math.floor(1000 + Math.random() * 9000).toString();
           pendingCodes.set(code, username.toLowerCase());
 
-          // Отправляем код пользователю в Telegram
           await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -54,7 +51,7 @@ async function pollTelegram() {
 pollTelegram();
 
 io.on('connection', (socket) => {
-  // Проверка кода
+  // Авторизация по коду
   socket.on('verify_code', (code) => {
     const username = pendingCodes.get(code.trim());
     if (username) {
@@ -65,6 +62,15 @@ io.on('connection', (socket) => {
     } else {
       socket.emit('auth_error', 'Неверный или устаревший код!');
     }
+  });
+
+  // Автоматический вход сохраненного пользователя
+  socket.on('auto_login', (username) => {
+    const cleanUser = username.trim().toLowerCase().replace(/^@/, '');
+    if (!cleanUser) return;
+    users.set(cleanUser, socket.id);
+    socketToUser.set(socket.id, cleanUser);
+    socket.emit('registered', { username: cleanUser });
   });
 
   // Отправка сообщений
