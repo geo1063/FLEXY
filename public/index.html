@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#09090b">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" id="meta-theme-color" content="#09090b">
 
   <title>FLEXY</title>
 
@@ -51,7 +51,7 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
-    html, body { background-color: var(--bg); color: var(--text); height: 100%; width: 100%; overflow: hidden; position: fixed; }
+    html, body { background-color: var(--bg); color: var(--text); height: 100%; width: 100%; overflow: hidden; position: fixed; transition: background-color 0.3s ease, color 0.3s ease; }
 
     .ambient-bg { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
     .ambient-glow-1 { position: absolute; top: -20%; left: -10%; width: 60vw; height: 60vw; background: var(--bg-ambient-1); filter: blur(120px); border-radius: 50%; }
@@ -164,7 +164,7 @@
             <span id="my-name">FLEXY</span>
           </div>
           <div class="header-actions">
-            <button class="icon-btn" id="theme-btn" onclick="toggleTheme()">🌙</button>
+            <button class="icon-btn" id="theme-btn" onclick="toggleTheme()" title="Переключить тему">🌓</button>
             <button class="icon-btn" id="notif-btn" onclick="requestNotificationPermission()">🔔</button>
             <button class="icon-btn" onclick="logout()">🚪</button>
           </div>
@@ -237,38 +237,62 @@
     window.addEventListener('touchstart', unlockAudio, { once: true });
     window.addEventListener('click', unlockAudio, { once: true });
 
-    // 🌗 Синхронизация с системой
-    function getSystemTheme() {
-      return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
-    }
+    // 🌗 НАДЕЖНАЯ СИНХРОНИЗАЦИЯ СИСТЕМНОЙ ТЕМЫ
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: light)');
 
-    function applyTheme(theme) {
-      if (theme === 'light') {
+    function updateTheme() {
+      const mode = localStorage.getItem('flexy_theme_mode') || 'system';
+      const themeBtn = document.getElementById('theme-btn');
+      const metaTheme = document.getElementById('meta-theme-color');
+
+      let isLight = false;
+
+      if (mode === 'system') {
+        isLight = mediaQuery.matches;
+        if (themeBtn) themeBtn.innerText = '🌓'; // Иконка авто-режима
+      } else if (mode === 'light') {
+        isLight = true;
+        if (themeBtn) themeBtn.innerText = '☀️';
+      } else {
+        isLight = false;
+        if (themeBtn) themeBtn.innerText = '🌙';
+      }
+
+      if (isLight) {
         document.body.classList.add('light-theme');
-        document.getElementById('theme-btn').innerText = '☀️';
+        if (metaTheme) metaTheme.setAttribute('content', '#f4f4f7');
       } else {
         document.body.classList.remove('light-theme');
-        document.getElementById('theme-btn').innerText = '🌙';
+        if (metaTheme) metaTheme.setAttribute('content', '#09090b');
       }
     }
 
-    // Загрузка темы (если вручную не меняли — берется системная)
-    const savedTheme = localStorage.getItem('flexy_theme') || getSystemTheme();
-    applyTheme(savedTheme);
+    // Порядок переключения: Авто (🌓) -> Темная (🌙) -> Светлая (☀️) -> Авто (🌓)
+    function toggleTheme() {
+      const currentMode = localStorage.getItem('flexy_theme_mode') || 'system';
+      let nextMode = 'system';
 
-    // Следим за изменениями системной темы ОС
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-      if (!localStorage.getItem('flexy_theme')) {
-        applyTheme(e.matches ? 'dark' : 'light');
+      if (currentMode === 'system') {
+        nextMode = 'dark';
+      } else if (currentMode === 'dark') {
+        nextMode = 'light';
+      } else {
+        nextMode = 'system';
+      }
+
+      localStorage.setItem('flexy_theme_mode', nextMode);
+      updateTheme();
+    }
+
+    // Реакция на смену темы в ОС в реальном времени
+    mediaQuery.addEventListener('change', () => {
+      if ((localStorage.getItem('flexy_theme_mode') || 'system') === 'system') {
+        updateTheme();
       }
     });
 
-    function toggleTheme() {
-      const isLight = document.body.classList.contains('light-theme');
-      const nextTheme = isLight ? 'dark' : 'light';
-      localStorage.setItem('flexy_theme', nextTheme);
-      applyTheme(nextTheme);
-    }
+    // Инициализация темы сразу при старте
+    updateTheme();
 
     let chatHistories = JSON.parse(localStorage.getItem('flexy_chat_histories') || '{}');
     let savedFriends = JSON.parse(localStorage.getItem('flexy_friends') || '[]');
