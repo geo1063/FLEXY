@@ -6,73 +6,176 @@
   <title>FLEXY</title>
   <style>
     :root {
-      --bg: #ffffff; --panel: #f4f4f5; --text: #000000; --text-muted: #707579;
-      --accent: #007aff; --msg-out: #e3f2fd; --msg-in: #f0f0f0; --border: #e5e5ea;
+      --bg: #000000;
+      --panel: #1c1c1e;
+      --panel-translucent: rgba(28, 28, 30, 0.85);
+      --pill-bg: rgba(255, 255, 255, 0.12);
+      --text: #ffffff;
+      --text-muted: #8e8e93;
+      --accent: #0a84ff;
+      --msg-out: #264970;
+      --msg-in: #212123;
+      --border: rgba(255, 255, 255, 0.08);
+      --avatar-bg: #f2a43b;
     }
 
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #0e1621; --panel: #17212b; --text: #f5f5f5; --text-muted: #7f91a4;
-        --accent: #5288c1; --msg-out: #2b5278; --msg-in: #182533; --border: #101921;
-      }
-    }
-
-    body.theme-dark {
-      --bg: #0e1621; --panel: #17212b; --text: #f5f5f5; --text-muted: #7f91a4;
-      --accent: #5288c1; --msg-out: #2b5278; --msg-in: #182533; --border: #101921;
-    }
-    body.theme-light {
-      --bg: #ffffff; --panel: #f4f4f5; --text: #000000; --text-muted: #707579;
-      --accent: #007aff; --msg-out: #e3f2fd; --msg-in: #f0f0f0; --border: #e5e5ea;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; -webkit-tap-highlight-color: transparent; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", sans-serif; -webkit-tap-highlight-color: transparent; }
     body { background-color: var(--bg); color: var(--text); height: 100vh; height: -webkit-fill-available; overflow: hidden; display: flex; justify-content: center; }
 
-    #auth-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; padding: 20px; }
-    .auth-card { background: var(--panel); padding: 30px; border-radius: 20px; width: 100%; max-width: 360px; text-align: center; border: 1px solid var(--border); }
-    .auth-card h2 { margin-bottom: 6px; font-weight: 700; font-size: 26px; }
-    .auth-card p { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.4; }
-    .bot-link-btn { display: block; width: 100%; padding: 14px; background: #2AABEE; color: white; text-decoration: none; border-radius: 12px; font-weight: 600; font-size: 15px; margin-bottom: 14px; }
-    .auth-card input { width: 100%; padding: 14px; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 12px; font-size: 18px; outline: none; margin-bottom: 12px; text-align: center; letter-spacing: 2px; }
-    .auth-card button { width: 100%; padding: 14px; background: var(--accent); color: white; border: none; border-radius: 12px; font-weight: 600; font-size: 16px; cursor: pointer; }
+    /* Вход */
+    #auth-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; padding: 20px; background: #0b0b0e; }
+    .auth-card { background: #18181b; padding: 32px 24px; border-radius: 24px; width: 100%; max-width: 360px; text-align: center; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    .auth-card h2 { margin-bottom: 8px; font-weight: 700; font-size: 28px; letter-spacing: -0.5px; }
+    .auth-card p { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.4; }
+    .bot-link-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 14px; background: #2AABEE; color: white; text-decoration: none; border-radius: 14px; font-weight: 600; font-size: 15px; margin-bottom: 14px; }
+    .auth-card input { width: 100%; padding: 14px; background: #000; border: 1px solid var(--border); color: var(--text); border-radius: 14px; font-size: 20px; outline: none; margin-bottom: 14px; text-align: center; letter-spacing: 4px; }
+    .auth-card button { width: 100%; padding: 14px; background: var(--accent); color: white; border: none; border-radius: 14px; font-weight: 600; font-size: 16px; cursor: pointer; }
 
+    /* Главный экран */
     #app-screen { display: none; width: 100%; height: 100vh; height: -webkit-fill-available; }
     .app-container { display: flex; width: 100%; height: 100%; }
 
-    .sidebar { width: 320px; background: var(--panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
-    .user-bar { padding: 16px; font-weight: 700; color: var(--accent); font-size: 18px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-    .theme-toggle-btn { background: none; border: none; font-size: 18px; cursor: pointer; }
+    /* Боковая панель */
+    .sidebar { width: 320px; background: #121214; border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+    .user-bar { padding: 14px 16px; font-weight: 700; color: #fff; font-size: 18px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: #18181a; }
+    .header-actions { display: flex; gap: 12px; align-items: center; }
+    .icon-btn { background: none; border: none; font-size: 18px; cursor: pointer; color: var(--text-muted); }
     
-    .invite-box { padding: 14px; }
-    .invite-btn { width: 100%; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 10px; font-weight: 600; font-size: 14px; cursor: pointer; }
+    .actions-box { padding: 12px; display: flex; flex-direction: column; gap: 8px; border-bottom: 1px solid var(--border); }
+    .action-btn { width: 100%; padding: 10px; background: var(--accent); color: white; border: none; border-radius: 12px; font-weight: 600; font-size: 13px; cursor: pointer; }
+    .action-btn.secondary { background: var(--pill-bg); color: var(--text); border: 1px solid var(--border); }
 
     .chats-list { flex: 1; overflow-y: auto; }
-    .chat-item { padding: 16px; cursor: pointer; border-bottom: 1px solid var(--border); font-weight: 500; }
-    .chat-item.active { background: var(--bg); }
+    .chat-item { padding: 14px 16px; cursor: pointer; border-bottom: 1px solid var(--border); font-weight: 500; display: flex; align-items: center; gap: 12px; }
+    .chat-item.active { background: #1f1f22; }
+    .chat-item-avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--avatar-bg); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; flex-shrink: 0; }
 
-    .chat-window { flex: 1; display: flex; flex-direction: column; background: var(--bg); }
-    .chat-header { padding: 14px 20px; background: var(--panel); font-weight: 600; border-bottom: 1px solid var(--border); display: flex; align-items: center; }
-    .back-btn { display: none; background: none; border: none; color: var(--accent); font-size: 16px; padding-right: 12px; }
+    /* Окно чата */
+    .chat-window { flex: 1; display: flex; flex-direction: column; background: #0c0c0e; position: relative; }
     
-    .messages-area { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; -webkit-overflow-scrolling: touch; }
-    .message { max-width: 75%; padding: 10px 14px; border-radius: 16px; font-size: 15px; line-height: 1.4; word-break: break-word; }
-    .message.sent { background: var(--msg-out); align-self: flex-end; border-bottom-right-radius: 4px; }
-    .message.received { background: var(--msg-in); align-self: flex-start; border-bottom-left-radius: 4px; }
-    .message img { max-width: 100%; max-height: 280px; border-radius: 12px; margin-top: 4px; display: block; }
-    .message .time { font-size: 10px; color: var(--text-muted); text-align: right; margin-top: 2px; }
+    /* Узор фона Telegram */
+    .chat-bg-pattern {
+      position: absolute; inset: 0; opacity: 0.12; pointer-events: none;
+      background-image: radial-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 0);
+      background-size: 18px 18px;
+    }
 
-    .input-area { padding: 10px 14px; padding-bottom: max(10px, env(safe-area-inset-bottom)); background: var(--panel); display: flex; gap: 10px; align-items: center; border-top: 1px solid var(--border); }
-    .input-area input[type="text"] { flex: 1; padding: 10px 14px; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 20px; font-size: 16px; outline: none; }
-    .attach-btn { color: var(--accent); font-size: 22px; cursor: pointer; }
-    .send-btn { background: none; border: none; color: var(--accent); font-weight: 600; font-size: 16px; cursor: pointer; }
+    /* Шапка чата как в Telegram iOS */
+    .chat-header {
+      padding: 10px 16px;
+      background: var(--panel-translucent);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 10;
+    }
+
+    .header-left { display: flex; align-items: center; gap: 8px; }
+    .back-btn-pill {
+      display: none; align-items: center; gap: 4px;
+      background: var(--pill-bg); border-radius: 20px;
+      padding: 6px 12px; color: var(--text); font-size: 14px; font-weight: 600;
+      border: none; cursor: pointer;
+    }
+
+    .header-center-pill {
+      background: var(--pill-bg);
+      border-radius: 20px;
+      padding: 6px 18px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .header-title { font-size: 15px; font-weight: 700; line-height: 1.2; }
+    .header-status { font-size: 11px; color: var(--text-muted); font-weight: 400; }
+
+    .header-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--avatar-bg); color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 16px;
+    }
+
+    /* Сообщения */
+    .messages-area {
+      flex: 1; padding: 16px; overflow-y: auto;
+      display: flex; flex-direction: column; gap: 10px;
+      z-index: 2; -webkit-overflow-scrolling: touch;
+    }
+
+    .system-date-pill {
+      align-self: center;
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(10px);
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 12px; font-weight: 500;
+      padding: 4px 14px; border-radius: 12px;
+      margin: 8px 0; text-align: center;
+    }
+
+    .message {
+      max-width: 75%; padding: 8px 12px; border-radius: 18px;
+      font-size: 15px; line-height: 1.35; word-break: break-word; position: relative;
+    }
+    .message.sent {
+      background: var(--msg-out); align-self: flex-end;
+      border-bottom-right-radius: 4px; color: #fff;
+    }
+    .message.received {
+      background: var(--msg-in); align-self: flex-start;
+      border-bottom-left-radius: 4px; color: #fff;
+    }
+    .message img { max-width: 100%; max-height: 280px; border-radius: 12px; margin-top: 4px; display: block; }
+    .message .time { font-size: 10px; color: rgba(255, 255, 255, 0.5); text-align: right; margin-top: 2px; }
+
+    /* Панель ввода в стиле Telegram iOS */
+    .input-area {
+      padding: 8px 12px;
+      padding-bottom: max(8px, env(safe-area-inset-bottom));
+      background: var(--panel-translucent);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      display: flex; gap: 8px; align-items: center;
+      border-top: 1px solid var(--border); z-index: 10;
+    }
+
+    .attach-btn-circle {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: var(--pill-bg); display: flex;
+      align-items: center; justify-content: center;
+      color: #fff; font-size: 18px; cursor: pointer; flex-shrink: 0;
+    }
+
+    .input-capsule {
+      flex: 1; display: flex; align-items: center;
+      background: var(--pill-bg); border-radius: 20px;
+      padding: 0 14px; border: 1px solid var(--border);
+    }
+    .input-capsule input {
+      flex: 1; background: none; border: none; outline: none;
+      color: #fff; font-size: 16px; padding: 10px 0;
+    }
+    .input-capsule input::placeholder { color: var(--text-muted); }
+    .input-icons { display: flex; gap: 8px; color: var(--text-muted); font-size: 15px; }
+
+    .action-circle-btn {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: var(--pill-bg); border: none; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; cursor: pointer; flex-shrink: 0;
+    }
+    .action-circle-btn.send { background: var(--accent); }
 
     @media (max-width: 768px) {
       .sidebar { width: 100%; }
       .chat-window { display: none; width: 100%; }
       .app-container.chat-active .sidebar { display: none; }
       .app-container.chat-active .chat-window { display: flex; }
-      .back-btn { display: block; }
+      .back-btn-pill { display: flex; }
     }
   </style>
 </head>
@@ -82,11 +185,13 @@
   <div id="auth-screen">
     <div class="auth-card">
       <h2>FLEXY</h2>
-      <p>Нажмите кнопку ниже, чтобы получить код в Telegram</p>
+      <p>Получите 4-значный код в Telegram для входа</p>
       
-      <a id="bot-btn" href="https://t.me/FlexyAuthBot" target="_blank" class="bot-link-btn">1. Получить код в Telegram 🤖</a>
+      <a id="bot-btn" href="https://t.me/FlexyAuthBot" target="_blank" class="bot-link-btn">
+        <span>🤖 Получить код в Telegram</span>
+      </a>
 
-      <input type="number" id="code-input" placeholder="Введите код" autocomplete="off">
+      <input type="number" id="code-input" placeholder="0000" autocomplete="off">
       <button onclick="verifyCode()">Войти в FLEXY</button>
     </div>
   </div>
@@ -94,29 +199,66 @@
   <!-- Главный экран -->
   <div id="app-screen">
     <div class="app-container" id="app-container">
+      
+      <!-- Список чатов -->
       <div class="sidebar">
         <div class="user-bar">
-          <span>FLEXY</span>
-          <button class="theme-toggle-btn" onclick="toggleTheme()">🌙</button>
+          <span id="my-name">FLEXY</span>
+          <div class="header-actions">
+            <button class="icon-btn" onclick="logout()" title="Выйти">🚪</button>
+          </div>
         </div>
-        <div class="invite-box">
-          <button class="invite-btn" onclick="copyInviteLink()">🔗 Скопировать ссылку-инвайт</button>
+        
+        <div class="actions-box">
+          <button class="action-btn" onclick="copyInviteLink()">🔗 Скопировать инвайт-ссылку</button>
+          <button class="action-btn secondary" onclick="addFriendPrompt()">➕ Добавить друга по @username</button>
         </div>
+
         <div class="chats-list" id="chats-list"></div>
       </div>
 
+      <!-- Чат -->
       <div class="chat-window">
+        <div class="chat-bg-pattern"></div>
+
+        <!-- Шапка iOS Telegram -->
         <div class="chat-header">
-          <button class="back-btn" onclick="closeMobileChat()">‹ Назад</button>
-          <span id="chat-title">Выберите чат</span>
+          <div class="header-left">
+            <button class="back-btn-pill" onclick="closeMobileChat()">‹ Назад</button>
+          </div>
+
+          <div class="header-center-pill">
+            <span class="header-title" id="chat-title">Чат не выбран</span>
+            <span class="header-status" id="chat-status">выберите собеседника</span>
+          </div>
+
+          <div class="header-avatar" id="chat-avatar">?</div>
         </div>
-        <div class="messages-area" id="messages-area"></div>
+
+        <!-- Поле сообщений -->
+        <div class="messages-area" id="messages-area">
+          <div class="system-date-pill">Выберите чат слева</div>
+        </div>
+
+        <!-- Нижняя панель ввода Telegram -->
         <div class="input-area" id="input-area" style="visibility: hidden;">
-          <label class="attach-btn">📷<input type="file" id="file-input" accept="image/*" style="display:none;" onchange="sendPhoto(event)"></label>
-          <input type="text" id="message-input" placeholder="Сообщение..." onkeydown="if(event.key==='Enter') sendTextMessage()">
-          <button class="send-btn" onclick="sendTextMessage()">Отправ.</button>
+          <label class="attach-btn-circle">
+            📎
+            <input type="file" id="file-input" accept="image/*" style="display:none;" onchange="sendPhoto(event)">
+          </label>
+
+          <div class="input-capsule">
+            <input type="text" id="message-input" placeholder="Публикация..." onkeydown="if(event.key==='Enter') sendTextMessage()">
+            <div class="input-icons">
+              <span>🔔</span>
+              <span>🌙</span>
+            </div>
+          </div>
+
+          <button class="action-circle-btn send" onclick="sendTextMessage()">🎤</button>
         </div>
       </div>
+
     </div>
   </div>
 
@@ -126,12 +268,18 @@
     let currentUser = '', activeChatUser = null;
     const chatHistories = {};
 
+    let savedFriends = JSON.parse(localStorage.getItem('flexy_friends') || '[]');
     const urlParams = new URLSearchParams(window.location.search);
     const pendingInvite = urlParams.get('invite');
 
+    const storedUser = localStorage.getItem('flexy_username');
+    if (storedUser) {
+      socket.emit('auto_login', storedUser);
+    }
+
     function verifyCode() {
       const code = document.getElementById('code-input').value.trim();
-      if (!code) return alert('Введите 4-значный код');
+      if (!code) return alert('Введите код');
       socket.emit('verify_code', code);
     }
 
@@ -139,13 +287,45 @@
 
     socket.on('registered', ({ username }) => {
       currentUser = username;
+      localStorage.setItem('flexy_username', username);
+      
+      document.getElementById('my-name').innerText = `@${username}`;
       document.getElementById('auth-screen').style.display = 'none';
       document.getElementById('app-screen').style.display = 'block';
 
       if (pendingInvite && pendingInvite.toLowerCase() !== currentUser.toLowerCase()) {
+        addFriend(pendingInvite.toLowerCase());
         openChat(pendingInvite.toLowerCase());
+      } else {
+        updateChatsList();
       }
     });
+
+    function logout() {
+      if (confirm('Выйти из аккаунта?')) {
+        localStorage.removeItem('flexy_username');
+        location.reload();
+      }
+    }
+
+    function addFriend(username) {
+      const clean = username.trim().toLowerCase().replace(/^@/, '');
+      if (!clean || clean === currentUser) return;
+      if (!savedFriends.includes(clean)) {
+        savedFriends.push(clean);
+        localStorage.setItem('flexy_friends', JSON.stringify(savedFriends));
+      }
+      updateChatsList();
+    }
+
+    function addFriendPrompt() {
+      const target = prompt('Введите @username друга:');
+      if (target) {
+        const clean = target.trim().toLowerCase().replace(/^@/, '');
+        addFriend(clean);
+        openChat(clean);
+      }
+    }
 
     function copyInviteLink() {
       const link = `${window.location.origin}?invite=${currentUser}`;
@@ -155,10 +335,15 @@
 
     function openChat(username) {
       activeChatUser = username;
+      addFriend(username);
       if (!chatHistories[username]) chatHistories[username] = [];
+      
       document.getElementById('chat-title').innerText = `@${username}`;
+      document.getElementById('chat-status').innerText = `в сети`;
+      document.getElementById('chat-avatar').innerText = username.charAt(0).toUpperCase();
       document.getElementById('input-area').style.visibility = 'visible';
       document.getElementById('app-container').classList.add('chat-active');
+      
       updateChatsList();
       renderMessages();
     }
@@ -169,10 +354,16 @@
 
     function updateChatsList() {
       const list = document.getElementById('chats-list'); list.innerHTML = '';
-      Object.keys(chatHistories).forEach(u => {
+      savedFriends.forEach(u => {
         const d = document.createElement('div');
         d.className = `chat-item ${u === activeChatUser ? 'active' : ''}`;
-        d.innerText = `@${u}`;
+        d.innerHTML = `
+          <div class="chat-item-avatar">${u.charAt(0).toUpperCase()}</div>
+          <div style="flex:1;">
+            <div style="font-size:15px; font-weight:600;">@${u}</div>
+            <div style="font-size:12px; color:var(--text-muted);">Нажмите, чтобы открыть чат</div>
+          </div>
+        `;
         d.onclick = () => openChat(u);
         list.appendChild(d);
       });
@@ -202,6 +393,7 @@
 
     function handleIncoming(data) {
       const partner = data.sender === currentUser ? data.to : data.sender;
+      addFriend(partner);
       if (!chatHistories[partner]) chatHistories[partner] = [];
       chatHistories[partner].push(data);
       if (activeChatUser === partner) renderMessages();
@@ -211,6 +403,12 @@
     function renderMessages() {
       const area = document.getElementById('messages-area'); area.innerHTML = '';
       if (!activeChatUser || !chatHistories[activeChatUser]) return;
+
+      const datePill = document.createElement('div');
+      datePill.className = 'system-date-pill';
+      datePill.innerText = 'Сегодня';
+      area.appendChild(datePill);
+
       chatHistories[activeChatUser].forEach(m => {
         const d = document.createElement('div');
         d.className = `message ${m.sender === currentUser ? 'sent' : 'received'}`;
@@ -220,13 +418,7 @@
       area.scrollTop = area.scrollHeight;
     }
 
-    function toggleTheme() {
-      document.body.classList.toggle('theme-dark');
-      document.body.classList.toggle('theme-light');
-    }
-
     function escapeHTML(s) { return s.replace(/[&<>'"]/g, t => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[t]||t)); }
   </script>
 </body>
 </html>
-
