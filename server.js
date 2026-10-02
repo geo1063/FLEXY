@@ -2,11 +2,12 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const TelegramBot = require('node-telegram-bot-api');
+const path = require('path'); // 👈 добавили путь
 
 const app = express();
 const server = http.createServer(app);
 
-// 🛑 Отключаем кэширование браузером, чтобы новый интерфейс применялся сразу
+// 🛑 Полный запрет кэширования
 app.use((req, res, next) => {
   res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
   res.setHeader('Pragma', 'no-cache');
@@ -14,11 +15,16 @@ app.use((req, res, next) => {
   next();
 });
 
-// Настройка отдачи статики и Socket.io с поддержкой файлов до 100 МБ
-app.use(express.static('public'));
+// Отдача статики
+app.use(express.static(path.join(__dirname, 'public')));
+
+// 🎯 Принудительно отдаем index.html при открытии сайта
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 const io = new Server(server, {
-  maxHttpBufferSize: 1e8, // 100 MB
+  maxHttpBufferSize: 1e8,
   pingTimeout: 60000,
   pingInterval: 25000,
   cors: { origin: "*" }
@@ -28,8 +34,12 @@ const TELEGRAM_BOT_TOKEN = '8957995967:AAHMGLzAEfC5UJL4CARs0TG_IK9K5TEWEMg';
 
 let bot;
 if (TELEGRAM_BOT_TOKEN) {
-  bot = new TelegramBot(TELEGRAM_BOT_TOKEN, { polling: true });
-  console.log('🤖 Telegram бот успешно запущен');
+  try {
+    bot = new TelegramBot(TELEGRAM_BOT_TOKEN, { polling: true });
+    console.log('🤖 Telegram бот запущен');
+  } catch (e) {
+    console.log(' Ошибка бота:', e.message);
+  }
 }
 
 const pendingCodes = {};
@@ -65,7 +75,7 @@ io.on('connection', (socket) => {
       registerUser(username);
       socket.emit('registered', { username });
     } else {
-      socket.emit('auth_error', 'Неверный или истекший код. Отправьте /start боту еще раз.');
+      socket.emit('auth_error', 'Неверный или истекший код.');
     }
   });
 
@@ -81,13 +91,7 @@ io.on('connection', (socket) => {
     if (!sender) return;
 
     const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const payload = { 
-      sender, 
-      to: to.toLowerCase(), 
-      content, 
-      type, 
-      time 
-    };
+    const payload = { sender, to: to.toLowerCase(), content, type, time };
 
     const targetSocketId = onlineUsers[to.toLowerCase()];
     if (targetSocketId) {
