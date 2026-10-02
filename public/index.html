@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -16,18 +15,18 @@
 
     :root {
       --bg: #09090b;
-      --bg-ambient-1: rgba(10, 132, 255, 0.18);
-      --bg-ambient-2: rgba(191, 90, 242, 0.15);
-      --card-bg: rgba(22, 22, 28, 0.75);
+      --bg-ambient-1: rgba(10, 132, 255, 0.15);
+      --bg-ambient-2: rgba(191, 90, 242, 0.12);
+      --card-bg: rgba(22, 22, 28, 0.95);
       --card-border: rgba(255, 255, 255, 0.1);
-      --glass-panel: rgba(18, 18, 22, 0.95);
+      --glass-panel: #121216;
       --text: #f4f4f5;
       --text-muted: #a1a1aa;
       --accent: #0a84ff;
       --accent-gradient: linear-gradient(135deg, #0a84ff 0%, #5e5ce6 100%);
       --msg-out-gradient: linear-gradient(135deg, #0071e3 0%, #0a84ff 100%);
-      --msg-in: rgba(255, 255, 255, 0.07);
-      --msg-in-border: rgba(255, 255, 255, 0.08);
+      --msg-in: rgba(255, 255, 255, 0.08);
+      --msg-in-border: rgba(255, 255, 255, 0.1);
       --input-bg: rgba(255, 255, 255, 0.06);
       --input-border: rgba(255, 255, 255, 0.12);
       --shadow-glow: 0 0 35px rgba(10, 132, 255, 0.25);
@@ -37,9 +36,9 @@
       --bg: #f4f4f7;
       --bg-ambient-1: rgba(0, 122, 255, 0.12);
       --bg-ambient-2: rgba(175, 82, 222, 0.1);
-      --card-bg: rgba(255, 255, 255, 0.85);
+      --card-bg: rgba(255, 255, 255, 0.95);
       --card-border: rgba(0, 0, 0, 0.08);
-      --glass-panel: rgba(255, 255, 255, 0.95);
+      --glass-panel: #ffffff;
       --text: #09090b;
       --text-muted: #71717a;
       --accent: #007aff;
@@ -59,7 +58,7 @@
     .ambient-glow-2 { position: absolute; bottom: -20%; right: -10%; width: 60vw; height: 60vw; background: var(--bg-ambient-2); filter: blur(120px); border-radius: 50%; }
 
     #toast-container { position: fixed; top: max(16px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; width: 90%; max-width: 400px; pointer-events: none; }
-    .toast-banner { pointer-events: auto; background: var(--glass-panel); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 1px solid var(--card-border); color: var(--text); padding: 14px 18px; border-radius: 20px; box-shadow: 0 16px 32px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 14px; cursor: pointer; animation: toastIn 0.3s ease; }
+    .toast-banner { pointer-events: auto; background: var(--glass-panel); border: 1px solid var(--card-border); color: var(--text); padding: 14px 18px; border-radius: 20px; box-shadow: 0 16px 32px rgba(0,0,0,0.4); display: flex; align-items: center; gap: 14px; cursor: pointer; animation: toastIn 0.3s ease; }
     @keyframes toastIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
 
     .toast-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--accent-gradient); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0; }
@@ -68,7 +67,7 @@
     .toast-body { font-size: 13px; color: var(--text-muted); text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
 
     #auth-screen { position: relative; z-index: 10; display: flex; justify-content: center; align-items: center; height: 100dvh; padding: 20px; }
-    .auth-card { background: var(--card-bg); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border: 1px solid var(--card-border); color: var(--text); padding: 40px 30px; border-radius: 32px; width: 100%; max-width: 380px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.4); }
+    .auth-card { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text); padding: 40px 30px; border-radius: 32px; width: 100%; max-width: 380px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
     .brand-badge { width: 64px; height: 64px; margin: 0 auto 16px; border-radius: 20px; background: var(--accent-gradient); display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 800; color: #fff; box-shadow: var(--shadow-glow); }
     .auth-card h2 { font-size: 26px; font-weight: 800; margin-bottom: 6px; }
     .auth-card p { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.5; }
@@ -78,9 +77,9 @@
     .submit-btn { width: 100%; padding: 16px; background: var(--accent-gradient); color: white; border: none; border-radius: 18px; font-weight: 700; font-size: 16px; cursor: pointer; box-shadow: var(--shadow-glow); }
 
     #app-screen { display: none; width: 100%; height: 100dvh; position: relative; z-index: 10; }
-    .app-container { display: flex; width: 100%; height: 100dvh; position: relative; overflow: hidden; }
+    .app-container { display: flex; width: 100%; height: 100dvh; position: relative; overflow: hidden; background: var(--bg); }
 
-    .sidebar { width: 360px; background: var(--glass-panel); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border-right: 1px solid var(--card-border); display: flex; flex-direction: column; height: 100dvh; flex-shrink: 0; }
+    .sidebar { width: 360px; background: var(--glass-panel); border-right: 1px solid var(--card-border); display: flex; flex-direction: column; height: 100dvh; flex-shrink: 0; z-index: 2; }
     .user-bar { padding: 18px 20px; padding-top: max(18px, env(safe-area-inset-top)); border-bottom: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center; }
     .user-info { font-size: 18px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
     .header-actions { display: flex; gap: 8px; }
@@ -95,8 +94,8 @@
     .chat-item:hover, .chat-item.active { background: var(--input-bg); border-color: var(--card-border); }
     .chat-item-avatar { width: 46px; height: 46px; border-radius: 16px; background: var(--accent-gradient); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; flex-shrink: 0; }
 
-    .chat-window { flex: 1; display: flex; flex-direction: column; justify-content: space-between; position: relative; height: 100dvh; overflow: hidden; background: var(--bg); }
-    .chat-header { padding: 14px 20px; padding-top: max(14px, env(safe-area-inset-top)); background: var(--glass-panel); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border-bottom: 1px solid var(--card-border); display: flex; align-items: center; justify-content: space-between; z-index: 10; }
+    .chat-window { flex: 1; display: flex; flex-direction: column; justify-content: space-between; height: 100dvh; overflow: hidden; background: var(--bg); z-index: 1; }
+    .chat-header { padding: 14px 20px; padding-top: max(14px, env(safe-area-inset-top)); background: var(--glass-panel); border-bottom: 1px solid var(--card-border); display: flex; align-items: center; justify-content: space-between; z-index: 10; }
     .header-left { display: flex; align-items: center; gap: 12px; }
     .back-btn-pill { display: none; align-items: center; justify-content: center; padding: 8px 14px; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 14px; color: var(--text); font-size: 13px; font-weight: 700; cursor: pointer; }
     .header-user-meta { display: flex; align-items: center; gap: 12px; }
@@ -106,28 +105,26 @@
     .header-status::before { content: ''; width: 6px; height: 6px; background: #30d158; border-radius: 50%; display: inline-block; }
 
     .messages-area { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; -webkit-overflow-scrolling: touch; }
-    .system-date-pill { align-self: center; background: var(--glass-panel); backdrop-filter: blur(10px); border: 1px solid var(--card-border); color: var(--text-muted); font-size: 12px; font-weight: 600; padding: 6px 16px; border-radius: 20px; margin: 12px 0; }
+    .system-date-pill { align-self: center; background: var(--glass-panel); border: 1px solid var(--card-border); color: var(--text-muted); font-size: 12px; font-weight: 600; padding: 6px 16px; border-radius: 20px; margin: 12px 0; }
 
     .message { max-width: 70%; padding: 12px 16px; border-radius: 22px; font-size: 15px; line-height: 1.45; word-break: break-word; position: relative; animation: msgPop 0.2s ease forwards; }
     @keyframes msgPop { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
     .message.sent { background: var(--msg-out-gradient); align-self: flex-end; border-bottom-right-radius: 6px; color: #ffffff; box-shadow: 0 4px 20px rgba(10, 132, 255, 0.25); }
-    .message.received { background: var(--msg-in); backdrop-filter: blur(15px); border: 1px solid var(--msg-in-border); align-self: flex-start; border-bottom-left-radius: 6px; color: var(--text); }
+    .message.received { background: var(--msg-in); border: 1px solid var(--msg-in-border); align-self: flex-start; border-bottom-left-radius: 6px; color: var(--text); }
     .message img { max-width: 100%; max-height: 320px; border-radius: 16px; margin-top: 6px; display: block; }
     .message .time { font-size: 10px; opacity: 0.6; text-align: right; margin-top: 4px; font-weight: 600; }
 
     .input-area-wrapper { padding: 12px 20px; padding-bottom: max(16px, env(safe-area-inset-bottom)); z-index: 10; }
-    .input-area { background: var(--glass-panel); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border: 1px solid var(--card-border); border-radius: 26px; padding: 6px 8px 6px 14px; display: flex; gap: 10px; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+    .input-area { background: var(--glass-panel); border: 1px solid var(--card-border); border-radius: 26px; padding: 6px 8px 6px 14px; display: flex; gap: 10px; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
     .attach-btn-circle { width: 40px; height: 40px; border-radius: 50%; background: var(--input-bg); border: 1px solid var(--input-border); display: flex; align-items: center; justify-content: center; color: var(--text); font-size: 18px; cursor: pointer; flex-shrink: 0; }
     .input-area input { flex: 1; background: none; border: none; outline: none; color: var(--text); font-size: 15px; font-weight: 500; }
     .send-circle-btn { width: 42px; height: 42px; border-radius: 50%; background: var(--accent-gradient); border: none; color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; box-shadow: var(--shadow-glow); }
 
-    /* 📱 Мобильная адаптация: гарантирует разделение экранов */
+    /* 📱 Мобильная верстка */
     @media (max-width: 768px) {
-      .sidebar { width: 100%; display: flex; }
-      .app-container.chat-active .sidebar { display: none !important; }
-      .chat-window { display: none; width: 100%; height: 100dvh; position: fixed; inset: 0; z-index: 20; background: var(--bg); }
-      .app-container.chat-active .chat-window { display: flex !important; }
+      .sidebar { width: 100%; }
+      .chat-window { width: 100%; }
       .back-btn-pill { display: flex; }
       .message { max-width: 85%; }
     }
@@ -158,9 +155,9 @@
   </div>
 
   <div id="app-screen">
-    <div class="app-container" id="app-container">
+    <div class="app-container">
       
-      <div class="sidebar">
+      <div class="sidebar" id="sidebar-view">
         <div class="user-bar">
           <div class="user-info">
             <span style="color: var(--accent);">●</span>
@@ -181,7 +178,7 @@
         <div class="chats-list" id="chats-list"></div>
       </div>
 
-      <div class="chat-window">
+      <div class="chat-window" id="chat-view">
         <div class="chat-header">
           <div class="header-left">
             <button class="back-btn-pill" onclick="closeMobileChat()">‹ Назад</button>
@@ -265,6 +262,27 @@
     const urlParams = new URLSearchParams(window.location.search);
     const pendingInvite = urlParams.get('invite');
 
+    // 🎯 Жесткое разделение экранов для телефонов
+    function syncView() {
+      const isMobile = window.innerWidth <= 768;
+      const sidebar = document.getElementById('sidebar-view');
+      const chat = document.getElementById('chat-view');
+      
+      if (isMobile) {
+        if (activeChatUser) {
+          sidebar.style.display = 'none';
+          chat.style.display = 'flex';
+        } else {
+          sidebar.style.display = 'flex';
+          chat.style.display = 'none';
+        }
+      } else {
+        sidebar.style.display = 'flex';
+        chat.style.display = 'flex';
+      }
+    }
+    window.addEventListener('resize', syncView);
+
     socket.on('connect', () => {
       const storedUser = localStorage.getItem('flexy_username');
       if (storedUser) {
@@ -294,6 +312,7 @@
         openChat(pendingInvite.toLowerCase());
       } else {
         updateChatsList();
+        syncView();
       }
     });
 
@@ -390,14 +409,15 @@
       document.getElementById('chat-avatar').innerText = activeChatUser.charAt(0).toUpperCase();
       document.getElementById('input-area-wrapper').style.visibility = 'visible';
       document.getElementById('clear-chat-btn').style.display = 'flex';
-      document.getElementById('app-container').classList.add('chat-active');
       
+      syncView();
       updateChatsList();
       renderMessages();
     }
 
     function closeMobileChat() {
-      document.getElementById('app-container').classList.remove('chat-active');
+      activeChatUser = null;
+      syncView();
     }
 
     function clearCurrentChat() {
